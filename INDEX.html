@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gabinete · Gestión clínica y financiera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===================== TOKENS ===================== */
+:root{
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Sora', var(--font-ui);
+
+  --bg: #eef2f3;
+  --bg-grad: radial-gradient(1200px 600px at 100% -10%, #e3edec 0%, transparent 60%), var(--bg);
+  --surface: #ffffff;
+  --surface-2: #f6f8f9;
+  --surface-3: #eef2f3;
+  --ink: #0c2b30;
+  --ink-2: #3d565c;
+  --muted: #6c858b;
+  --line: #dde6e7;
+  --line-2: #e9eff0;
+
+  --primary: #0f7d76;
+  --primary-deep: #0a4f4b;
+  --primary-soft: #e4f2f0;
+  --accent: #d9893b;
+  --accent-soft: #fbeedd;
+
+  --pos: #12936a;          /* ingresos */
+  --pos-soft: #e3f4ec;
+  --neg: #d6584a;          /* egresos */
+  --neg-soft: #fbe9e6;
+  --warn: #cf9420;
+  --info: #3a73b8;
+
+  --shadow-sm: 0 1px 2px rgba(12,43,48,.06), 0 1px 3px rgba(12,43,48,.05);
+  --shadow-md: 0 6px 20px rgba(12,43,48,.08);
+  --shadow-lg: 0 18px 50px rgba(12,43,48,.18);
+  --radius: 16px;
+  --radius-sm: 11px;
+}
+[data-theme="dark"]{
+  --bg: #0c1517;
+  --bg-grad: radial-gradient(1200px 600px at 100% -10%, #11272a 0%, transparent 60%), var(--bg);
+  --surface: #13212400;
+  --surface: #142225;
+  --surface-2: #17282b;
+  --surface-3: #1c2f33;
+  --ink: #e8f1f1;
+  --ink-2: #b3c6c8;
+  --muted: #7e979b;
+  --line: #25393d;
+  --line-2: #20343800;
+  --line-2: #203438;
+  --primary: #2bb1a5;
+  --primary-deep: #2bb1a5;
+  --primary-soft: #16332f;
+  --accent: #e0a05a;
+  --accent-soft: #2e2417;
+  --pos: #34c08a;
+  --pos-soft: #14322a;
+  --neg: #ef7367;
+  --neg-soft: #3a201d;
+  --warn: #e0b04a;
+  --info: #6aa3e0;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+  --shadow-md: 0 8px 24px rgba(0,0,0,.45);
+  --shadow-lg: 0 20px 50px rgba(0,0,0,.6);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font-ui);
+  background:var(--bg-grad);
+  background-attachment:fixed;
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;line-height:1.2;color:var(--ink)}
+button{font-family:inherit}
+.tnum{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+
+/* ===================== APP SHELL ===================== */
+.app{display:flex;min-height:100vh}
+
+.rail{
+  width:248px;flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;
+  padding:20px 14px;
+}
+.brand{display:flex;align-items:center;gap:11px;padding:6px 8px 16px;}
+.brand .logo{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  background:linear-gradient(140deg,var(--primary),var(--primary-deep));
+  display:grid;place-items:center;color:#fff;box-shadow:var(--shadow-sm);
+}
+.brand .logo svg{width:21px;height:21px}
+.brand .name{font-family:var(--font-display);font-weight:700;font-size:15.5px;letter-spacing:-.2px;line-height:1.1}
+.brand .name small{display:block;font-family:var(--font-ui);font-weight:500;font-size:11px;color:var(--muted);letter-spacing:.2px}
+
+.nav{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+.nav a{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;border-radius:11px;
+  color:var(--ink-2);text-decoration:none;font-weight:500;font-size:14.5px;
+  cursor:pointer;transition:background .15s,color .15s;
+  border:1px solid transparent;
+}
+.nav a svg{width:19px;height:19px;flex-shrink:0;opacity:.8}
+.nav a:hover{background:var(--surface-2);color:var(--ink)}
+.nav a.active{background:var(--primary-soft);color:var(--primary-deep);border-color:color-mix(in srgb,var(--primary) 22%,transparent)}
+[data-theme="dark"] .nav a.active{color:var(--primary)}
+.nav a.active svg{opacity:1}
+
+.rail-foot{margin-top:auto;display:flex;flex-direction:column;gap:6px;padding-top:14px;border-top:1px solid var(--line-2)}
+.rail-foot .meta{font-size:11px;color:var(--muted);padding:2px 10px}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+
+.topbar{
+  position:sticky;top:0;z-index:30;
+  background:color-mix(in srgb,var(--bg) 78%,transparent);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  padding:16px 28px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.topbar .page-h{display:flex;flex-direction:column;gap:1px;margin-right:auto;min-width:0}
+.topbar .page-h h1{font-size:21px;letter-spacing:-.3px}
+.topbar .page-h p{font-size:13px;color:var(--muted)}
+.content{padding:24px 28px 40px;max-width:1180px;width:100%}
+
+/* mobile menu button (hidden desktop) */
+.menu-btn{display:none}
+
+/* ===================== BUTTONS ===================== */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;justify-content:center;
+  padding:9px 16px;border-radius:11px;border:1px solid transparent;
+  font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;
+  transition:transform .08s,background .15s,box-shadow .15s,border-color .15s;
+}
+.btn svg{width:16px;height:16px}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-primary:hover{background:var(--primary-deep)}
+[data-theme="dark"] .btn-primary{color:#062320}
+.btn-pos{background:var(--pos);color:#fff}
+.btn-pos:hover{filter:brightness(.93)}
+.btn-neg{background:var(--neg);color:#fff}
+.btn-neg:hover{filter:brightness(.93)}
+.btn-ghost{background:var(--surface);color:var(--ink-2);border-color:var(--line)}
+.btn-ghost:hover{background:var(--surface-2);color:var(--ink)}
+.btn-soft{background:var(--surface-2);color:var(--ink-2);border-color:var(--line-2)}
+.btn-soft:hover{background:var(--surface-3)}
+.btn-sm{padding:6px 11px;font-size:13px;border-radius:9px;gap:5px}
+.btn-icon{padding:8px;border-radius:10px;background:var(--surface);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;display:grid;place-items:center;transition:background .15s}
+.btn-icon:hover{background:var(--surface-2);color:var(--ink)}
+.btn-icon svg{width:18px;height:18px}
+
+/* ===================== CARDS ===================== */
+.card{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);
+}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.card-h h2{font-size:16px;letter-spacing:-.2px;display:flex;align-items:center;gap:8px}
+.card-h .sub{font-size:12.5px;color:var(--muted)}
+.grid{display:grid;gap:18px}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
+.kpi{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:17px 18px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--primary)}
+.kpi.pos::before{background:var(--pos)}.kpi.neg::before{background:var(--neg)}.kpi.bal::before{background:var(--accent)}.kpi.cal::before{background:var(--info)}
+.kpi .kicon{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;margin-bottom:11px;background:var(--surface-2);color:var(--ink-2)}
+.kpi.pos .kicon{background:var(--pos-soft);color:var(--pos)}
+.kpi.neg .kicon{background:var(--neg-soft);color:var(--neg)}
+.kpi.bal .kicon{background:var(--accent-soft);color:var(--accent)}
+.kpi.cal .kicon{background:color-mix(in srgb,var(--info) 14%,transparent);color:var(--info)}
+.kpi .kicon svg{width:18px;height:18px}
+.kpi .klabel{font-size:12.5px;color:var(--muted);font-weight:500}
+.kpi .kvalue{font-family:var(--font-display);font-weight:700;font-size:25px;letter-spacing:-.5px;margin-top:2px;line-height:1.1}
+.kpi .ksub{font-size:12px;margin-top:6px;display:flex;align-items:center;gap:5px;color:var(--muted)}
+.trend{display:inline-flex;align-items:center;gap:3px;font-weight:600;padding:1px 6px;border-radius:20px;font-size:11.5px}
+.trend.up{color:var(--pos);background:var(--pos-soft)}
+.trend.down{color:var(--neg);background:var(--neg-soft)}
+.trend svg{width:12px;height:12px}
+
+.dash-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:18px;margin-bottom:18px}
+.dash-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+/* ===================== TABLES ===================== */
+.tbl-wrap{overflow-x:auto;border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead th{
+  text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--muted);font-weight:600;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+tbody td{padding:11px 12px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--surface-2)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.amt-pos{color:var(--pos);font-weight:600}
+.amt-neg{color:var(--neg);font-weight:600}
+
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:600;background:var(--surface-2);color:var(--ink-2)}
+.badge.green{background:var(--pos-soft);color:var(--pos)}
+.badge.red{background:var(--neg-soft);color:var(--neg)}
+.badge.amber{background:var(--accent-soft);color:var(--accent)}
+.badge.blue{background:color-mix(in srgb,var(--info) 14%,transparent);color:var(--info)}
+.badge.gray{background:var(--surface-3);color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+.row-act{display:flex;gap:4px;justify-content:flex-end}
+.iact{background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;border-radius:8px;display:grid;place-items:center;transition:background .15s,color .15s}
+.iact:hover{background:var(--surface-3);color:var(--ink)}
+.iact.danger:hover{background:var(--neg-soft);color:var(--neg)}
+.iact svg{width:16px;height:16px}
+
+/* ===================== FORMS / TOOLBAR ===================== */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12.5px;font-weight:600;color:var(--ink-2)}
+input,select,textarea{
+  width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;
+  font-size:14.5px;font-family:inherit;background:var(--surface);color:var(--ink);transition:border .15s,box-shadow .15s;
+}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 18%,transparent)}
+textarea{resize:vertical;min-height:74px}
+.search{position:relative;flex:1;min-width:180px;max-width:320px}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--muted);pointer-events:none}
+.search input{padding-left:36px}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.seg button{border:none;background:none;padding:6px 13px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm)}
+select.compact{width:auto;padding:8px 30px 8px 12px;font-size:13.5px;cursor:pointer}
+
+/* ===================== EMPTY ===================== */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty .eicon{width:54px;height:54px;border-radius:14px;background:var(--surface-2);display:grid;place-items:center;margin:0 auto 14px;color:var(--muted)}
+.empty .eicon svg{width:26px;height:26px}
+.empty h3{font-size:16px;color:var(--ink-2);margin-bottom:5px}
+.empty p{font-size:13.5px;max-width:340px;margin:0 auto 16px}
+
+/* ===================== CALENDAR ===================== */
+.cal-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.cal-title{font-family:var(--font-display);font-weight:600;font-size:18px;text-transform:capitalize;min-width:170px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-dow{font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;text-align:center;padding:4px 0}
+.cal-cell{
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:11px;
+  min-height:96px;padding:7px;cursor:pointer;transition:border .15s,background .15s;
+  display:flex;flex-direction:column;gap:3px;overflow:hidden;
+}
+.cal-cell:hover{border-color:var(--primary);background:var(--surface)}
+.cal-cell.out{opacity:.4}
+.cal-cell.today{border-color:var(--primary);background:var(--primary-soft)}
+.cal-cell .dnum{font-size:13px;font-weight:600;color:var(--ink-2);display:flex;justify-content:space-between;align-items:center}
+.cal-cell.today .dnum{color:var(--primary-deep)}
+[data-theme="dark"] .cal-cell.today .dnum{color:var(--primary)}
+.cal-cell .dnum .cnt{font-size:10px;background:var(--primary);color:#fff;border-radius:10px;padding:0 5px;font-weight:700}
+.chip{font-size:11px;font-weight:500;padding:2px 6px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:3px solid var(--muted);background:var(--surface)}
+.chip.pendiente{border-color:var(--info);background:color-mix(in srgb,var(--info) 12%,transparent)}
+.chip.atendido{border-color:var(--pos);background:var(--pos-soft)}
+.chip.cancelado{border-color:var(--muted);background:var(--surface-3);text-decoration:line-through;opacity:.7}
+.chip.ausente{border-color:var(--neg);background:var(--neg-soft)}
+.chip.more{text-align:center;color:var(--muted);border-color:transparent;background:transparent;font-weight:600}
+
+/* ===================== MODAL ===================== */
+.overlay{position:fixed;inset:0;background:rgba(8,24,27,.5);backdrop-filter:blur(3px);z-index:100;display:none;align-items:flex-start;justify-content:center;padding:28px 16px;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);width:100%;max-width:520px;margin:auto;animation:pop .18s ease}
+.modal.wide{max-width:680px}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.modal-h{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line-2)}
+.modal-h h2{font-size:17px}
+.modal-b{padding:22px}
+.modal-f{padding:16px 22px;border-top:1px solid var(--line-2);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid .full{grid-column:1/-1}
+.x-close{background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;border-radius:8px;display:grid;place-items:center}
+.x-close:hover{background:var(--surface-2);color:var(--ink)}
+.x-close svg{width:20px;height:20px}
+
+/* type toggle in money modal */
+.type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.type-toggle button{padding:13px;border-radius:12px;border:2px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;font-size:14.5px;color:var(--ink-2);display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s}
+.type-toggle button svg{width:18px;height:18px}
+.type-toggle button.on-pos{border-color:var(--pos);background:var(--pos-soft);color:var(--pos)}
+.type-toggle button.on-neg{border-color:var(--neg);background:var(--neg-soft);color:var(--neg)}
+
+/* mini list (dashboard) */
+.mini{display:flex;flex-direction:column}
+.mini-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--line-2)}
+.mini-row:last-child{border-bottom:none}
+.mini-ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex-shrink:0}
+.mini-ic.pos{background:var(--pos-soft);color:var(--pos)}
+.mini-ic.neg{background:var(--neg-soft);color:var(--neg)}
+.mini-ic.cita{background:color-mix(in srgb,var(--info) 13%,transparent);color:var(--info)}
+.mini-ic svg{width:17px;height:17px}
+.mini-row .txt{min-width:0;flex:1}
+.mini-row .txt .t1{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-row .txt .t2{font-size:12px;color:var(--muted)}
+.mini-row .val{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* patient cards */
+.pt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.pt-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform .12s,box-shadow .15s,border-color .15s}
+.pt-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:color-mix(in srgb,var(--primary) 30%,transparent)}
+.pt-card .av{width:42px;height:42px;border-radius:12px;background:linear-gradient(140deg,var(--primary),var(--primary-deep));color:#fff;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:16px;margin-bottom:11px}
+.pt-card h3{font-size:15.5px;letter-spacing:-.2px}
+.pt-card .pt-meta{font-size:12.5px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:6px}
+.pt-card .pt-foot{display:flex;justify-content:space-between;margin-top:13px;padding-top:12px;border-top:1px solid var(--line-2);font-size:12.5px}
+.pt-card .pt-foot b{font-family:var(--font-display);font-size:14px}
+
+.detail-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.detail-stats .ds{background:var(--surface-2);border-radius:11px;padding:12px;text-align:center}
+.detail-stats .ds .n{font-family:var(--font-display);font-weight:700;font-size:19px}
+.detail-stats .ds .l{font-size:11.5px;color:var(--muted);margin-top:2px}
+
+/* legend */
+.legend{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.legend .lg{display:flex;align-items:center;gap:9px;font-size:13px}
+.legend .lg .sw{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.legend .lg .nm{flex:1;color:var(--ink-2)}
+.legend .lg .vl{font-weight:600;font-variant-numeric:tabular-nums}
+.legend .lg .pc{color:var(--muted);font-size:12px;width:42px;text-align:right}
+
+/* toast */
+#toasts{position:fixed;bottom:22px;right:22px;z-index:200;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+.toast{background:var(--ink);color:#fff;padding:12px 16px;border-radius:12px;box-shadow:var(--shadow-lg);font-size:14px;font-weight:500;display:flex;align-items:center;gap:9px;animation:slidein .25s ease;max-width:340px}
+.toast svg{width:18px;height:18px;flex-shrink:0}
+.toast.ok{background:var(--pos)}.toast.err{background:var(--neg)}.toast.info{background:var(--primary-deep)}
+[data-theme="dark"] .toast{color:#06201d}
+@keyframes slidein{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+
+.view{display:none}
+.view.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.bar-chart{display:flex;align-items:flex-end;gap:2px}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width:1080px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .dash-grid{grid-template-columns:1fr}
+}
+@media (max-width:860px){
+  .rail{
+    position:fixed;bottom:0;left:0;top:auto;width:100%;height:auto;flex-direction:row;
+    border-right:none;border-top:1px solid var(--line);padding:6px 6px;z-index:50;
+    box-shadow:0 -4px 20px rgba(12,43,48,.08);
+  }
+  .rail .brand,.rail .rail-foot{display:none}
+  .nav{flex-direction:row;justify-content:space-around;width:100%;gap:0;margin:0}
+  .nav a{flex-direction:column;gap:3px;padding:7px 4px;font-size:10.5px;border-radius:10px;flex:1}
+  .nav a span.lbl{font-size:10.5px}
+  .nav a svg{width:21px;height:21px}
+  .nav a.active{background:transparent;border-color:transparent;color:var(--primary)}
+  .main{padding-bottom:70px}
+  .topbar{padding:14px 16px}
+  .content{padding:18px 16px 30px}
+  .topbar .page-h h1{font-size:18px}
+  .dash-grid-2{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .cal-cell{min-height:64px;padding:5px}
+  .chip{font-size:9.5px;padding:1px 4px}
+  .topbar-actions .hide-sm{display:none}
+}
+@media (max-width:480px){
+  .kpis{grid-template-columns:1fr}
+}
+@media print{
+  .rail,.topbar-actions,.toolbar,.row-act,#toasts{display:none!important}
+  body{background:#fff}
+  .card,.kpi{box-shadow:none;border-color:#ccc}
+}
+[hidden]{display:none!important}
+body{font-size:16px}
+.access-wrap{min-height:100vh;display:grid;place-items:center;padding:24px}
+.access-card{width:100%;max-width:450px;padding:32px}
+.access-card h1{font-size:28px;margin:16px 0 8px}
+.access-card p{color:var(--ink-2);margin:10px 0 20px}
+.access-card .field{margin:16px 0}
+.access-card .btn{width:100%}
+.eyebrow{font-size:14px;color:var(--primary);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.notice{font-size:14px;padding:12px;background:var(--primary-soft);border-radius:10px;color:var(--ink-2);margin:12px 0}
+.clinical-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:16px 0}
+.clinical-grid article{padding:14px;border:1px solid var(--line);border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.clinical-grid h4{font-size:14px;margin-bottom:7px;color:var(--muted)}
+.timeline-item{border-left:3px solid var(--primary);padding:12px 16px;margin:14px 0;background:var(--surface-2);border-radius:0 10px 10px 0}
+.timeline-item p{white-space:pre-wrap;margin:8px 0;overflow-wrap:anywhere}
+.action-line{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.day-entry{border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}
+.day-entry header{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.day-entry h3{font-size:16px;flex:1}
+.week-grid{display:grid;grid-template-columns:repeat(7,minmax(170px,1fr));gap:10px;overflow-x:auto}
+.week-day{background:var(--surface-2);border-radius:12px;padding:10px}
+.week-day h3{font-size:15px;margin-bottom:12px}
+.field label{font-size:14px}.modal{max-height:92vh}.modal-body{overflow-y:auto}
+.error-text{color:var(--neg)!important;min-height:24px}
+@media(max-width:680px){.clinical-grid{grid-template-columns:1fr}.access-card{padding:24px}.action-line .btn{flex:1}.cal-cell{min-height:75px;padding:4px}.chip{font-size:12px}.modal{width:96vw}.topbar{padding:12px}.content{padding:14px}}
+
+</style>
+</head>
+<body>
+
+<div id="access"></div>
+<div class="app" id="appShell" hidden> 
+  <!-- ===== RAIL / NAV ===== -->
+  <aside class="rail">
+    <div class="brand">
+      <div class="logo" id="brandLogo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-7 4 14 2-7h4"/></svg>
+      </div>
+      <div class="name" id="brandName">Mi Gabinete<small>Gestión clínica</small></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="rail-foot">
+      <button class="btn btn-soft btn-sm" onclick="toggleTheme()"><span id="themeIcon"></span><span id="themeLbl">Modo oscuro</span></button>
+      <button class="btn btn-soft btn-sm" onclick="openSettings()">Ajustes y respaldos</button><button class="btn btn-soft btn-sm" onclick="accountSettings()">Mi cuenta</button><button class="btn btn-soft btn-sm" onclick="lockApp()">Cerrar sesión</button><div class="meta" id="storageMeta">Datos guardados en este dispositivo</div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+    <header class="topbar">
+      <div class="page-h">
+        <h1 id="pageTitle">Resumen</h1>
+        <p id="pageSub">Vista general de tu gabinete</p>
+      </div>
+      <div class="topbar-actions" style="display:flex;gap:9px;flex-wrap:wrap" id="topActions"></div>
+    </header>
+    <div class="content">
+      <!-- DASHBOARD -->
+      <section class="view active" id="view-dashboard"></section>
+      <!-- MOVIMIENTOS -->
+      <section class="view" id="view-movimientos"></section>
+      <!-- AGENDA -->
+      <section class="view" id="view-agenda"></section>
+      <!-- PACIENTES -->
+      <section class="view" id="view-pacientes"></section>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div id="toasts"></div>
+
+<script>
+/* ===========================================================
+   GABINETE — CRM clínico (datos locales, sin servidor)
+   =========================================================== */
+
+/* ---------- ICONS ---------- */
+const I = {
+  dash:'<path d="M3 13h8V3H3zM13 21h8V8h-8zM13 3v3h8V3zM3 17v4h8v-4z"/>',
+  money:'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>',
+  trash:'<path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  edit:'<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>',
+  chevL:'<path d="m15 18-6-6 6-6"/>',
+  chevR:'<path d="m9 18 6-6-6-6"/>',
+  up:'<path d="M12 19V5M5 12l7-7 7 7"/>',
+  down:'<path d="M12 5v14M19 12l-7 7-7-7"/>',
+  arrowDown:'<path d="M12 5v14M5 12l7 7 7-7"/>',
+  arrowUp:'<path d="M12 19V5M5 12l7-7 7 7"/>',
+  phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  sun:'<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>',
+  moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+  inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  cfg:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+};
+function svg(p,w){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;}
+
+/* ---------- CONFIG ---------- */
+const DB_KEY='crm_gabinete_v2';
+const LEGACY_KEY='crm_ingresos';
+
+const CAT_ING = ['Paciente','Curso','Venta de productos','Otro'];
+const CAT_EGR = ['Insumos','Alquiler','Servicios','Sueldos','Marketing','Equipamiento','Impuestos','Otro'];
+const METODOS = ['Efectivo','Transferencia','QR','Tarjeta'];
+const ESTADOS = {
+  pendiente:{lbl:'Pendiente',cls:'blue'},
+  atendido:{lbl:'Atendido',cls:'green'},
+  cancelado:{lbl:'Cancelado',cls:'gray'},
+  ausente:{lbl:'No asistió',cls:'red'}
+};
+// paleta para gráficos de categorías
+const PALETTE = ['#0f7d76','#d9893b','#3a73b8','#12936a','#d6584a','#9061c2','#c9a227','#5b8f8a','#b8627d'];
+
+/* ---------- STATE ---------- */
+function defaultState(){
+  return {version:2, config:{nombre:'Mi Gabinete', moneda:'Bs', tema:'light'}, movimientos:[], pacientes:[], citas:[]};
+}
+let state = loadState();
+
+function uid(){return 'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+
+function loadState(){
+  try{
+    const raw=localStorage.getItem(DB_KEY);
+    if(raw){
+      const s=JSON.parse(raw);
+      const d=defaultState();
+      return {...d,...s, config:{...d.config,...(s.config||{})},
+        movimientos:s.movimientos||[], pacientes:s.pacientes||[], citas:s.citas||[]};
+    }
+    // Migrar datos del CRM anterior (solo ingresos)
+    const legacy=localStorage.getItem(LEGACY_KEY);
+    const st=defaultState();
+    if(legacy){
+      const arr=JSON.parse(legacy)||[];
+      st.movimientos=arr.map(i=>({
+        id:uid(), tipo:'ingreso', monto:Number(i.monto)||0,
+        glosa:i.glosa||'(sin glosa)', categoria:i.categoria||'Otro',
+        metodo:'Efectivo', pacienteId:null,
+        fecha:new Date(i.timestamp||Date.now()).toISOString().slice(0,10),
+        timestamp:i.timestamp||Date.now()
+      }));
+    }
+    return st;
+  }catch(e){ console.warn('Estado por defecto:',e); return defaultState(); }
+}
+function save(){try{localStorage.setItem(DB_KEY,JSON.stringify(state));}catch(e){toast('No se pudo guardar (almacenamiento lleno)','err');}}
+
+/* ---------- FORMAT ---------- */
+const nfMoney=new Intl.NumberFormat('es-BO',{minimumFractionDigits:2,maximumFractionDigits:2});
+const nfInt=new Intl.NumberFormat('es-BO');
+function money(n){return esc(state.config.moneda)+' '+nfMoney.format(Number(n)||0);}
+function moneyShort(n){
+  n=Number(n)||0;
+  if(Math.abs(n)>=1000) return esc(state.config.moneda)+' '+nfInt.format(Math.round(n));
+  return money(n);
+}
+function todayISO(){const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);}
+function monthKey(iso){return (iso||'').slice(0,7);}
+function curMonthKey(){return todayISO().slice(0,7);}
+function prevMonthKey(mk){const [y,m]=mk.split('-').map(Number);const d=new Date(y,m-2,1);return d.toISOString().slice(0,7);}
+function monthLabel(mk){const [y,m]=mk.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('es',{month:'long',year:'numeric'});}
+function fmtDate(iso){if(!iso)return '—';const [y,m,d]=iso.split('-');return `${d}/${m}/${y}`;}
+function fmtDateLong(iso){const [y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('es',{weekday:'short',day:'numeric',month:'short'});}
+function esc(t){const d=document.createElement('div');d.textContent=(t==null?'':String(t));return d.innerHTML.replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+function initials(name){return (name||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase();}
+
+/* ---------- DATA HELPERS ---------- */
+function pacienteNombre(id){const p=state.pacientes.find(p=>p.id===id);return p?p.nombre:null;}
+function movsByMonth(mk){return state.movimientos.filter(m=>monthKey(m.fecha)===mk);}
+function sumBy(arr,tipo){return arr.filter(m=>m.tipo===tipo).reduce((s,m)=>s+(Number(m.monto)||0),0);}
+
+/* ===========================================================
+   NAVIGATION
+   =========================================================== */
+const VIEWS=[
+  {id:'dashboard',label:'Resumen',icon:I.dash,title:'Resumen',sub:'Vista general de tu gabinete'},
+  {id:'movimientos',label:'Finanzas',icon:I.money,title:'Movimientos',sub:'Ingresos, egresos y balance'},
+  {id:'agenda',label:'Agenda',icon:I.calendar,title:'Agenda',sub:'Calendario y control de citas'},
+  {id:'pacientes',label:'Pacientes',icon:I.users,title:'Pacientes',sub:'Fichas e historial'},
+];
+let currentView='dashboard';
+
+function buildNav(){
+  document.getElementById('nav').innerHTML=VIEWS.map(v=>
+    `<a data-view="${v.id}" onclick="go('${v.id}')">${svg(v.icon)}<span class="lbl">${v.label}</span></a>`
+  ).join('');
+}
+function go(id){
+  currentView=id;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.dataset.view===id));
+  const v=VIEWS.find(v=>v.id===id);
+  document.getElementById('pageTitle').textContent=v.title;
+  document.getElementById('pageSub').textContent=v.sub;
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ===========================================================
+   RENDER ROUTER
+   =========================================================== */
+let dashMonth=curMonthKey();
+let calDate=new Date();
+let movFilter={tipo:'todos',cat:'',q:'',mes:''};
+let ptQuery='';
+
+function render(){
+  renderTopActions();
+  if(currentView==='dashboard') renderDashboard();
+  if(currentView==='movimientos') renderMovimientos();
+  if(currentView==='agenda') renderAgenda();
+  if(currentView==='pacientes') renderPacientes();
+}
+
+function renderTopActions(){
+  const el=document.getElementById('topActions');
+  let html='';
+  if(currentView==='movimientos'){
+    html=`<button class="btn btn-pos" onclick="openMovModal('ingreso')">${svg(I.arrowDown)}Ingreso</button>
+          <button class="btn btn-neg" onclick="openMovModal('egreso')">${svg(I.arrowUp)}Egreso</button>`;
+  }else if(currentView==='agenda'){
+    html=`<button class="btn btn-primary" onclick="openCitaModal(null,todayISO())">${svg(I.plus)}Nueva cita</button>`;
+  }else if(currentView==='pacientes'){
+    html=`<button class="btn btn-primary" onclick="openPacienteModal()">${svg(I.plus)}Nuevo paciente</button>`;
+  }else{
+    html=`<button class="btn btn-pos btn-sm" onclick="openMovModal('ingreso')">${svg(I.plus)}<span class="hide-sm">Ingreso</span></button>
+          <button class="btn btn-primary btn-sm" onclick="openCitaModal(null,todayISO())">${svg(I.plus)}<span class="hide-sm">Cita</span></button>`;
+  }
+  html+=`<button class="btn-icon hide-sm" title="Exportar copia de seguridad" onclick="exportData()">${svg(I.download)}</button>
+         <button class="btn-icon hide-sm" title="Importar copia" onclick="importData()">${svg(I.upload)}</button>
+         <button class="btn-icon hide-sm" title="Ajustes" onclick="openSettings()">${svg(I.cfg)}</button>`;
+  el.innerHTML=html;
+}
+
+/* ===========================================================
+   DASHBOARD
+   =========================================================== */
+function renderDashboard(){
+  const mk=dashMonth, pmk=prevMonthKey(mk);
+  const cur=movsByMonth(mk), prev=movsByMonth(pmk);
+  const ing=sumBy(cur,'ingreso'), egr=sumBy(cur,'egreso'), bal=ing-egr;
+  const ingP=sumBy(prev,'ingreso'), egrP=sumBy(prev,'egreso');
+  const citasHoy=state.citas.filter(c=>c.fecha===todayISO()&&c.estado!=='cancelado');
+  const proximas=state.citas.filter(c=>c.fecha>=todayISO()&&c.estado==='pendiente')
+    .sort((a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora)).slice(0,5);
+  const ultimos=[...state.movimientos].sort((a,b)=>b.timestamp-a.timestamp).slice(0,6);
+
+  const monthHasData=state.movimientos.length>0||state.citas.length>0;
+
+  document.getElementById('view-dashboard').innerHTML=`
+    <div class="toolbar" style="justify-content:space-between">
+      <div class="seg" role="group" aria-label="Mes">
+        <button class="btn-icon" style="border:none;background:none;padding:6px" onclick="shiftDashMonth(-1)">${svg(I.chevL)}</button>
+        <span style="display:inline-flex;align-items:center;font-weight:600;text-transform:capitalize;padding:0 8px;min-width:140px;justify-content:center">${monthLabel(mk)}</span>
+        <button class="btn-icon" style="border:none;background:none;padding:6px" onclick="shiftDashMonth(1)">${svg(I.chevR)}</button>
+      </div>
+      ${mk!==curMonthKey()?`<button class="btn btn-soft btn-sm" onclick="dashMonth=curMonthKey();render()">Mes actual</button>`:''}
+    </div>
+
+    <div class="kpis">
+      ${kpiCard('pos',I.arrowDown,'Ingresos del mes',money(ing),trend(ing,ingP))}
+      ${kpiCard('neg',I.arrowUp,'Egresos del mes',money(egr),trend(egr,egrP,true))}
+      ${kpiCard('bal',I.money,'Balance del mes',money(bal),`<span class="ksub">${bal>=0?'Saldo positivo':'Saldo negativo'} · margen ${ing>0?Math.round(bal/ing*100):0}%</span>`)}
+      ${kpiCard('cal',I.calendar,'Citas hoy',String(citasHoy.length),`<span class="ksub">${proximas.length} pendientes próximas</span>`)}
+    </div>
+
+    ${monthHasData?`
+    <div class="dash-grid">
+      <div class="card">
+        <div class="card-h"><h2>Flujo de los últimos 6 meses</h2></div>
+        ${cashflowChart(mk)}
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Egresos por categoría</h2><span class="sub" style="text-transform:capitalize">${monthLabel(mk)}</span></div>
+        ${donutCategoria(cur.filter(m=>m.tipo==='egreso'),'No registraste egresos este mes.')}
+      </div>
+    </div>
+
+    <div class="dash-grid-2">
+      <div class="card">
+        <div class="card-h"><h2>Próximas citas</h2><a class="sub" style="cursor:pointer;color:var(--primary)" onclick="go('agenda')">Ver agenda</a></div>
+        ${proximas.length?`<div class="mini">${proximas.map(c=>`
+          <div class="mini-row">
+            <div class="mini-ic cita">${svg(I.clock)}</div>
+            <div class="txt"><div class="t1">${esc(pacienteNombre(c.pacienteId)||c.pacienteNombre||'Cita')}</div>
+            <div class="t2">${fmtDateLong(c.fecha)} · ${c.hora||'—'} ${c.motivo?'· '+esc(c.motivo):''}</div></div>
+            <span class="badge ${ESTADOS[c.estado].cls}">${ESTADOS[c.estado].lbl}</span>
+          </div>`).join('')}</div>`
+          :`<div class="empty" style="padding:24px"><p>Sin citas próximas. Agenda una desde la sección Agenda.</p></div>`}
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Últimos movimientos</h2><a class="sub" style="cursor:pointer;color:var(--primary)" onclick="go('movimientos')">Ver todos</a></div>
+        ${ultimos.length?`<div class="mini">${ultimos.map(m=>`
+          <div class="mini-row">
+            <div class="mini-ic ${m.tipo==='ingreso'?'pos':'neg'}">${svg(m.tipo==='ingreso'?I.arrowDown:I.arrowUp)}</div>
+            <div class="txt"><div class="t1">${esc(m.glosa)}</div><div class="t2">${esc(m.categoria)} · ${fmtDate(m.fecha)}</div></div>
+            <span class="val ${m.tipo==='ingreso'?'amt-pos':'amt-neg'}">${m.tipo==='ingreso'?'+':'−'}${money(m.monto)}</span>
+          </div>`).join('')}</div>`
+          :`<div class="empty" style="padding:24px"><p>Aún no hay movimientos.</p></div>`}
+      </div>
+    </div>
+    `:`
+    <div class="card">
+      <div class="empty">
+        <div class="eicon">${svg(I.dash)}</div>
+        <h3>Tu gabinete está listo para empezar</h3>
+        <p>Registra tu primer ingreso o agenda una cita. Todo se guarda en este dispositivo, sin necesidad de internet.</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-pos" onclick="openMovModal('ingreso')">${svg(I.plus)}Registrar ingreso</button>
+          <button class="btn btn-primary" onclick="openCitaModal(null,todayISO())">${svg(I.plus)}Agendar cita</button>
+        </div>
+      </div>
+    </div>`}
+  `;
+}
+function shiftDashMonth(d){const [y,m]=dashMonth.split('-').map(Number);dashMonth=new Date(y,m-1+d,1).toISOString().slice(0,7);render();}
+function kpiCard(cls,icon,label,value,sub){
+  return `<div class="kpi ${cls}"><div class="kicon">${svg(icon)}</div>
+    <div class="klabel">${label}</div><div class="kvalue tnum">${value}</div>${sub||''}</div>`;
+}
+function trend(cur,prev,inverse){
+  if(!prev) return `<span class="ksub">Sin dato del mes anterior</span>`;
+  const pct=Math.round((cur-prev)/prev*100);
+  const up=pct>=0;
+  const good=inverse?!up:up;
+  return `<span class="ksub"><span class="trend ${good?'up':'down'}">${svg(up?I.up:I.down)}${Math.abs(pct)}%</span> vs. mes anterior</span>`;
+}
+
+/* ----- CHARTS (SVG nativo) ----- */
+function cashflowChart(mk){
+  // últimos 6 meses terminando en mk
+  const [y,m]=mk.split('-').map(Number);
+  const months=[];
+  for(let i=5;i>=0;i--){const d=new Date(y,m-1-i,1);months.push(d.toISOString().slice(0,7));}
+  const data=months.map(k=>({k,ing:sumBy(movsByMonth(k),'ingreso'),egr:sumBy(movsByMonth(k),'egreso')}));
+  const max=Math.max(1,...data.map(d=>Math.max(d.ing,d.egr)));
+  const W=560,H=210,padB=34,padT=12,padL=8,padR=8;
+  const innerH=H-padB-padT, gw=(W-padL-padR)/data.length, bw=Math.min(20,gw/3.2);
+  let bars='';
+  data.forEach((d,i)=>{
+    const cx=padL+gw*i+gw/2;
+    const hi=Math.max(2,d.ing/max*innerH), he=Math.max(2,d.egr/max*innerH);
+    bars+=`<rect x="${cx-bw-2}" y="${padT+innerH-hi}" width="${bw}" height="${hi}" rx="4" fill="var(--pos)"></rect>`;
+    bars+=`<rect x="${cx+2}" y="${padT+innerH-he}" width="${bw}" height="${he}" rx="4" fill="var(--neg)"></rect>`;
+    const lbl=new Date(d.k+'-01').toLocaleDateString('es',{month:'short'});
+    bars+=`<text x="${cx}" y="${H-12}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="Inter">${lbl}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Flujo mensual">
+    <line x1="${padL}" y1="${padT+innerH}" x2="${W-padR}" y2="${padT+innerH}" stroke="var(--line)" stroke-width="1"/>
+    ${bars}</svg>
+    <div style="display:flex;gap:18px;justify-content:center;margin-top:6px;font-size:12.5px;color:var(--ink-2)">
+      <span style="display:inline-flex;align-items:center;gap:6px"><span class="sw" style="width:11px;height:11px;border-radius:3px;background:var(--pos)"></span>Ingresos</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><span class="sw" style="width:11px;height:11px;border-radius:3px;background:var(--neg)"></span>Egresos</span>
+    </div>`;
+}
+function donutCategoria(movs,emptyMsg){
+  if(!movs.length) return `<div class="empty" style="padding:24px"><p>${emptyMsg}</p></div>`;
+  const byCat={};
+  movs.forEach(m=>byCat[m.categoria]=(byCat[m.categoria]||0)+(Number(m.monto)||0));
+  const entries=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  const total=entries.reduce((s,e)=>s+e[1],0);
+  const R=52,C=2*Math.PI*R,cx=70,cy=70;let off=0,segs='';
+  entries.forEach(([cat,val],i)=>{
+    const frac=val/total, len=frac*C, color=PALETTE[i%PALETTE.length];
+    segs+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${color}" stroke-width="20"
+      stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 ${cx} ${cy})"></circle>`;
+    off+=len;
+  });
+  const legend=entries.map(([cat,val],i)=>`
+    <div class="lg"><span class="sw" style="background:${PALETTE[i%PALETTE.length]}"></span>
+    <span class="nm">${esc(cat)}</span><span class="vl tnum">${moneyShort(val)}</span>
+    <span class="pc">${Math.round(val/total*100)}%</span></div>`).join('');
+  return `<div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+    <div style="position:relative;flex-shrink:0">
+      <svg viewBox="0 0 140 140" width="140" height="140">${segs}</svg>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+        <span style="font-family:var(--font-display);font-weight:700;font-size:15px" class="tnum">${moneyShort(total)}</span>
+        <span style="font-size:10.5px;color:var(--muted)">total</span>
+      </div>
+    </div>
+    <div class="legend" style="flex:1;min-width:170px">${legend}</div>
+  </div>`;
+}
+
+/* ===========================================================
+   MOVIMIENTOS
+   =========================================================== */
+function renderMovimientos(){
+  let movs=[...state.movimientos];
+  if(movFilter.tipo!=='todos') movs=movs.filter(m=>m.tipo===movFilter.tipo);
+  if(movFilter.cat) movs=movs.filter(m=>m.categoria===movFilter.cat);
+  if(movFilter.mes) movs=movs.filter(m=>monthKey(m.fecha)===movFilter.mes);
+  if(movFilter.q){const q=movFilter.q.toLowerCase();movs=movs.filter(m=>m.glosa.toLowerCase().includes(q)||m.categoria.toLowerCase().includes(q));}
+  movs.sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.timestamp-a.timestamp);
+
+  const ing=sumBy(movs,'ingreso'), egr=sumBy(movs,'egreso'), bal=ing-egr;
+  const cats=[...new Set(state.movimientos.map(m=>m.categoria))].sort();
+  const meses=[...new Set(state.movimientos.map(m=>monthKey(m.fecha)))].sort().reverse();
+
+  document.getElementById('view-movimientos').innerHTML=`
+    <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
+      ${kpiCard('pos',I.arrowDown,'Ingresos (filtro)',money(ing),'')}
+      ${kpiCard('neg',I.arrowUp,'Egresos (filtro)',money(egr),'')}
+      ${kpiCard('bal',I.money,'Balance (filtro)',money(bal),'')}
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <div class="seg">
+          ${['todos','ingreso','egreso'].map(t=>`<button class="${movFilter.tipo===t?'on':''}" onclick="setMovFilter('tipo','${t}')">${t==='todos'?'Todos':t==='ingreso'?'Ingresos':'Egresos'}</button>`).join('')}
+        </div>
+        <div class="search">${svg(I.search)}<input placeholder="Buscar glosa o categoría…" value="${esc(movFilter.q)}" oninput="setMovFilter('q',this.value)"></div>
+        <select class="compact" onchange="setMovFilter('cat',this.value)">
+          <option value="">Toda categoría</option>
+          ${cats.map(c=>`<option ${movFilter.cat===c?'selected':''}>${esc(c)}</option>`).join('')}
+        </select>
+        <select class="compact" onchange="setMovFilter('mes',this.value)">
+          <option value="">Todo el tiempo</option>
+          ${meses.map(m=>`<option value="${m}" ${movFilter.mes===m?'selected':''} style="text-transform:capitalize">${monthLabel(m)}</option>`).join('')}
+        </select>
+        <button class="btn btn-soft btn-sm" style="margin-left:auto" onclick="exportCSV()">${svg(I.doc)}CSV</button>
+      </div>
+
+      ${movs.length?`<div class="tbl-wrap"><table>
+        <thead><tr><th>Fecha</th><th>Glosa</th><th>Categoría</th><th>Paciente</th><th>Método</th><th class="num">Monto</th><th></th></tr></thead>
+        <tbody>${movs.map(m=>`<tr>
+          <td class="tnum" style="white-space:nowrap;color:var(--ink-2)">${fmtDate(m.fecha)}</td>
+          <td><strong>${esc(m.glosa)}</strong></td>
+          <td><span class="badge ${m.tipo==='ingreso'?'green':'red'}"><span class="dot" style="background:currentColor"></span>${esc(m.categoria)}</span></td>
+          <td style="color:var(--muted)">${esc(pacienteNombre(m.pacienteId)||'—')}</td>
+          <td style="color:var(--muted)">${esc(m.metodo||'—')}</td>
+          <td class="num ${m.tipo==='ingreso'?'amt-pos':'amt-neg'}">${m.tipo==='ingreso'?'+':'−'} ${money(m.monto)}</td>
+          <td><div class="row-act">
+            <button class="iact" title="Editar" onclick="openMovModal('${m.tipo}','${m.id}')">${svg(I.edit)}</button>
+            <button class="iact danger" title="Eliminar" onclick="delMov('${m.id}')">${svg(I.trash)}</button>
+          </div></td>
+        </tr>`).join('')}</tbody></table></div>`
+      :`<div class="empty"><div class="eicon">${svg(I.inbox)}</div>
+        <h3>Sin movimientos${movFilter.tipo!=='todos'||movFilter.q||movFilter.cat||movFilter.mes?' con estos filtros':''}</h3>
+        <p>Registra un ingreso o un egreso con los botones de arriba para empezar a llevar el control.</p></div>`}
+    </div>`;
+}
+function setMovFilter(k,v){movFilter[k]=v;renderMovimientos();}
+
+/* ===========================================================
+   AGENDA / CALENDARIO
+   =========================================================== */
+function renderAgenda(){
+  const y=calDate.getFullYear(), m=calDate.getMonth();
+  const first=new Date(y,m,1), startDow=(first.getDay()+6)%7; // lunes=0
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const daysPrev=new Date(y,m,0).getDate();
+  const grid=[];
+  for(let i=0;i<42;i++){
+    if(i<startDow){grid.push({iso:isoOf(y,m,daysPrev-startDow+1+i,-1),out:true,num:daysPrev-startDow+1+i});}
+    else if(i<startDow+daysInMonth){const d=i-startDow+1;grid.push({iso:isoOf(y,m,d,0),out:false,num:d});}
+    else{const d=i-startDow-daysInMonth+1;grid.push({iso:isoOf(y,m,d,1),out:true,num:d});}
+  }
+  const dows=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const today=todayISO();
+
+  document.getElementById('view-agenda').innerHTML=`
+    <div class="card">
+      <div class="cal-head">
+        <button class="btn-icon" onclick="shiftCal(-1)">${svg(I.chevL)}</button>
+        <span class="cal-title">${calDate.toLocaleDateString('es',{month:'long',year:'numeric'})}</span>
+        <button class="btn-icon" onclick="shiftCal(1)">${svg(I.chevR)}</button>
+        <button class="btn btn-soft btn-sm" onclick="calDate=new Date();render()">Hoy</button>
+        <div style="margin-left:auto;display:flex;gap:13px;flex-wrap:wrap;font-size:12px;color:var(--ink-2)">
+          ${Object.entries(ESTADOS).map(([k,v])=>`<span style="display:inline-flex;align-items:center;gap:5px"><span class="dot" style="background:${k==='pendiente'?'var(--info)':k==='atendido'?'var(--pos)':k==='ausente'?'var(--neg)':'var(--muted)'}"></span>${v.lbl}</span>`).join('')}
+        </div>
+      </div>
+      <div class="cal-grid">
+        ${dows.map(d=>`<div class="cal-dow">${d}</div>`).join('')}
+        ${grid.map(c=>{
+          const cs=state.citas.filter(ci=>ci.fecha===c.iso).sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
+          const show=cs.slice(0,3);
+          return `<div class="cal-cell ${c.out?'out':''} ${c.iso===today?'today':''}" onclick="openDay('${c.iso}')">
+            <div class="dnum">${c.num}${cs.length?`<span class="cnt">${cs.length}</span>`:''}</div>
+            ${show.map(ci=>`<div class="chip ${ci.estado}" title="${esc(pacienteNombre(ci.pacienteId)||ci.pacienteNombre||'')}">${ci.hora?ci.hora+' ':''}${esc(pacienteNombre(ci.pacienteId)||ci.pacienteNombre||ci.motivo||'Cita')}</div>`).join('')}
+            ${cs.length>3?`<div class="chip more">+${cs.length-3} más</div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+function isoOf(y,m,d,off){const dt=new Date(y,m+off,d);return new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString().slice(0,10);}
+function shiftCal(n){calDate=new Date(calDate.getFullYear(),calDate.getMonth()+n,1);render();}
+
+function openDay(iso){
+  const cs=state.citas.filter(c=>c.fecha===iso).sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
+  const body=`
+    ${cs.length?`<div class="mini" style="margin-bottom:6px">${cs.map(c=>{
+      const nom=pacienteNombre(c.pacienteId)||c.pacienteNombre||'Cita';
+      return `<div class="mini-row">
+        <div class="mini-ic cita">${svg(I.clock)}</div>
+        <div class="txt"><div class="t1">${c.hora?'<span class="tnum">'+c.hora+'</span> · ':''}${esc(nom)}</div>
+        <div class="t2">${c.motivo?esc(c.motivo):'Sin motivo'} ${c.duracion?'· '+c.duracion+' min':''}</div></div>
+        <span class="badge ${ESTADOS[c.estado].cls}">${ESTADOS[c.estado].lbl}</span>
+        <div class="row-act">
+          <button class="iact" title="Editar" onclick="openCitaModal('${c.id}')">${svg(I.edit)}</button>
+          <button class="iact danger" title="Eliminar" onclick="delCita('${c.id}','${iso}')">${svg(I.trash)}</button>
+        </div></div>`;
+    }).join('')}</div>`
+    :`<div class="empty" style="padding:22px"><p>No hay citas para este día.</p></div>`}`;
+  openModal({
+    title:`Citas · ${fmtDate(iso)}`,
+    body,
+    footer:`<button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
+            <button class="btn btn-primary" onclick="openCitaModal(null,'${iso}')">${svg(I.plus)}Agregar cita</button>`
+  });
+}
+
+/* ===========================================================
+   PACIENTES
+   =========================================================== */
+function renderPacientes(){
+  let pts=state.pacientes.filter(p=>showArchived?!!p.archivado:!p.archivado);
+  if(ptQuery){const q=ptQuery.toLowerCase();pts=pts.filter(p=>p.nombre.toLowerCase().includes(q)||(p.telefono||'').includes(q)||(p.dolencia||'').toLowerCase().includes(q));}
+  pts.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+
+  const stats=p=>{
+    const pagos=state.movimientos.filter(m=>m.pacienteId===p.id&&m.tipo==='ingreso');
+    const total=pagos.reduce((s,m)=>s+(Number(m.monto)||0),0);
+    const citas=state.citas.filter(c=>c.pacienteId===p.id);
+    return {total,nCitas:citas.length};
+  };
+
+  document.getElementById('view-pacientes').innerHTML=`
+    <div class="toolbar">
+      <div class="search" style="max-width:380px">${svg(I.search)}<input placeholder="Buscar por nombre, teléfono o dolencia…" value="${esc(ptQuery)}" oninput="ptQuery=this.value;renderPacientes()"></div>
+      <button class="btn btn-soft" onclick="showArchived=!showArchived;renderPacientes()">${showArchived?'Ver activos':'Ver archivados'}</button><span class="sub">${pts.length} paciente(s)</span>
+    </div>
+    ${pts.length?`<div class="pt-grid">${pts.map(p=>{const s=stats(p);return `
+      <div class="pt-card" onclick="openPacienteDetail('${p.id}')">
+        <div class="av">${esc(initials(p.nombre))}</div>
+        <h3>${esc(p.nombre)}</h3>
+        <div class="pt-meta">${p.telefono?svg(I.phone)+' '+esc(p.telefono):'<span style="color:var(--muted)">Sin teléfono</span>'}</div>
+        ${p.dolencia?`<div class="pt-meta" style="margin-top:5px"><span class="badge gray">${esc(p.dolencia)}</span></div>`:''}
+        <div class="pt-foot"><span style="color:var(--muted)">${s.nCitas} cita(s)</span><span>Pagado <b class="tnum">${moneyShort(s.total)}</b></span></div>
+      </div>`;}).join('')}</div>`
+    :`<div class="card"><div class="empty"><div class="eicon">${svg(I.users)}</div>
+      <h3>${state.pacientes.length?'Sin resultados':'Aún no tienes pacientes'}</h3>
+      <p>${state.pacientes.length?'Prueba con otro término de búsqueda.':'Crea la ficha de un paciente para registrar sus citas y pagos.'}</p>
+      ${state.pacientes.length?'':`<button class="btn btn-primary" onclick="openPacienteModal()">${svg(I.plus)}Nuevo paciente</button>`}</div></div>`}
+  `;
+}
+
+function openPacienteDetail(id){
+  const p=state.pacientes.find(p=>p.id===id);if(!p)return;
+  const pagos=state.movimientos.filter(m=>m.pacienteId===id).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const citas=state.citas.filter(c=>c.pacienteId===id).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const total=pagos.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+(+m.monto||0),0);
+  const body=`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+      <div class="av" style="width:52px;height:52px;border-radius:14px;background:linear-gradient(140deg,var(--primary),var(--primary-deep));color:#fff;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:19px">${esc(initials(p.nombre))}</div>
+      <div>
+        <h2 style="font-size:19px">${esc(p.nombre)}</h2>
+        <div style="font-size:13px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;margin-top:3px">
+          ${p.telefono?`<span style="display:inline-flex;gap:5px;align-items:center">${svg(I.phone)}${esc(p.telefono)}</span>`:''}
+          ${p.email?`<span>${esc(p.email)}</span>`:''}
+        </div>
+      </div>
+    </div>
+    ${p.dolencia?`<div style="margin-bottom:14px"><span class="badge amber">${esc(p.dolencia)}</span></div>`:''}
+    ${p.notas?`<div style="background:var(--surface-2);border-radius:11px;padding:12px;font-size:13.5px;color:var(--ink-2);margin-bottom:16px">${esc(p.notas)}</div>`:''}
+    <div class="detail-stats">
+      <div class="ds"><div class="n tnum">${citas.length}</div><div class="l">Citas</div></div>
+      <div class="ds"><div class="n tnum">${pagos.length}</div><div class="l">Pagos</div></div>
+      <div class="ds"><div class="n tnum">${moneyShort(total)}</div><div class="l">Total pagado</div></div>
+    </div>
+    <h4 style="font-size:14px;margin-bottom:8px">Historial de citas</h4>
+    ${citas.length?`<div class="mini" style="margin-bottom:16px">${citas.slice(0,6).map(c=>`
+      <div class="mini-row"><div class="mini-ic cita">${svg(I.clock)}</div>
+        <div class="txt"><div class="t1">${fmtDate(c.fecha)} ${c.hora?'· '+c.hora:''}</div><div class="t2">${esc(c.motivo||'Sin motivo')}</div></div>
+        <span class="badge ${ESTADOS[c.estado].cls}">${ESTADOS[c.estado].lbl}</span></div>`).join('')}</div>`
+      :`<p style="color:var(--muted);font-size:13.5px;margin-bottom:16px">Sin citas registradas.</p>`}
+    <h4 style="font-size:14px;margin-bottom:8px">Pagos</h4>
+    ${pagos.length?`<div class="mini">${pagos.slice(0,6).map(m=>`
+      <div class="mini-row"><div class="mini-ic ${m.tipo==='ingreso'?'pos':'neg'}">${svg(m.tipo==='ingreso'?I.arrowDown:I.arrowUp)}</div>
+        <div class="txt"><div class="t1">${esc(m.glosa)}</div><div class="t2">${fmtDate(m.fecha)}</div></div>
+        <span class="val ${m.tipo==='ingreso'?'amt-pos':'amt-neg'}">${money(m.monto)}</span></div>`).join('')}</div>`
+      :`<p style="color:var(--muted);font-size:13.5px">Sin pagos registrados.</p>`}
+  `;
+  openModal({
+    title:'Ficha del paciente',
+    wide:true,
+    body,
+    footer:`<button class="btn btn-ghost danger" style="margin-right:auto;color:var(--neg)" onclick="delPaciente('${id}')">${svg(I.trash)}Eliminar</button>
+            <button class="btn btn-soft" onclick="closeModal()">Cerrar</button>
+            <button class="btn btn-primary" onclick="openPacienteModal('${id}')">${svg(I.edit)}Editar</button>`
+  });
+}
+
+/* ===========================================================
+   MODALS — FORMULARIOS
+   =========================================================== */
+function openModal({title,body,footer,wide}){
+  const ov=document.getElementById('overlay');
+  ov.innerHTML=`<div class="modal ${wide?'wide':''}" role="dialog" aria-modal="true">
+    <div class="modal-h"><h2>${title}</h2><button class="x-close" onclick="closeModal()" aria-label="Cerrar">${svg(I.x)}</button></div>
+    <div class="modal-b">${body}</div>
+    ${footer?`<div class="modal-f">${footer}</div>`:''}
+  </div>`;
+  ov.classList.add('open');
+  document.body.style.overflow='hidden';
+  const fi=ov.querySelector('input,select,textarea');if(fi)setTimeout(()=>fi.focus(),50);
+}
+function closeModal(){const ov=document.getElementById('overlay');ov.classList.remove('open');ov.innerHTML='';document.body.style.overflow='';}
+document.getElementById('overlay').addEventListener('mousedown',e=>{if(e.target.id==='overlay')closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+/* ----- MOVIMIENTO ----- */
+let _movType='ingreso';
+function openMovModal(tipo,id){
+  const edit=id?state.movimientos.find(m=>m.id===id):null;
+  _movType=edit?edit.tipo:tipo;
+  const pacOpts=state.pacientes.filter(p=>!p.archivado||p.id===edit?.pacienteId).sort((a,b)=>a.nombre.localeCompare(b.nombre))
+    .map(p=>`<option value="${p.id}" ${edit&&edit.pacienteId===p.id?'selected':''}>${esc(p.nombre)}</option>`).join('');
+  const renderCats=()=>{const cats=_movType==='ingreso'?CAT_ING:CAT_EGR;return cats.map(c=>`<option ${edit&&edit.categoria===c?'selected':''}>${c}</option>`).join('');};
+  const body=`
+    <div class="type-toggle">
+      <button id="ttIng" onclick="setMovType('ingreso')">${svg(I.arrowDown)}Ingreso</button>
+      <button id="ttEgr" onclick="setMovType('egreso')">${svg(I.arrowUp)}Egreso</button>
+    </div>
+    <div class="form-grid">
+      <div class="field"><label>Monto (${esc(state.config.moneda)})</label><input type="number" id="mMonto" step="0.01" min="0.01" placeholder="0.00" value="${edit?edit.monto:''}"></div>
+      <div class="field"><label>Fecha</label><input type="date" id="mFecha" value="${edit?edit.fecha:todayISO()}"></div>
+      <div class="field full"><label>Glosa / concepto</label><input type="text" id="mGlosa" placeholder="Ej: Sesión de terapia — Juan Pérez" value="${edit?esc(edit.glosa):''}"></div>
+      <div class="field"><label>Categoría</label><select id="mCat">${renderCats()}</select></div>
+      <div class="field"><label>Método de pago</label><select id="mMetodo">${METODOS.map(x=>`<option ${edit&&edit.metodo===x?'selected':''}>${x}</option>`).join('')}</select></div>
+      <div class="field full" id="mPacWrap"><label>Paciente (opcional)</label><select id="mPac"><option value="">— Ninguno —</option>${pacOpts}</select></div>
+    </div>`;
+  openModal({
+    title:edit?'Editar movimiento':'Nuevo movimiento',
+    body,
+    footer:`<button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveMov('${id||''}')">${svg(I.check)}${edit?'Guardar cambios':'Registrar'}</button>`
+  });
+  setMovType(_movType);
+}
+function setMovType(t){
+  _movType=t;
+  document.getElementById('ttIng').className=t==='ingreso'?'on-pos':'';
+  document.getElementById('ttEgr').className=t==='egreso'?'on-neg':'';
+  const sel=document.getElementById('mCat');
+  const cats=t==='ingreso'?CAT_ING:CAT_EGR;
+  const prev=sel.value;
+  sel.innerHTML=cats.map(c=>`<option ${c===prev?'selected':''}>${c}</option>`).join('');
+  document.getElementById('mPacWrap').style.display=t==='ingreso'?'':'none';
+}
+function saveMov(id){
+  const monto=parseFloat(document.getElementById('mMonto').value);
+  const glosa=document.getElementById('mGlosa').value.trim();
+  const fecha=document.getElementById('mFecha').value||todayISO();
+  if(!monto||monto<=0){toast('Ingresa un monto mayor a 0','err');return;}
+  if(glosa.length<2){toast('Escribe una glosa o concepto','err');return;}
+  const data={
+    tipo:_movType,monto,glosa,fecha,
+    categoria:document.getElementById('mCat').value,
+    metodo:document.getElementById('mMetodo').value,
+    pacienteId:_movType==='ingreso'?(document.getElementById('mPac').value||null):null
+  };
+  if(id){const m=state.movimientos.find(m=>m.id===id);Object.assign(m,data);toast('Movimiento actualizado','ok');}
+  else{state.movimientos.push({id:uid(),timestamp:Date.now(),...data});toast(`${_movType==='ingreso'?'Ingreso':'Egreso'} registrado`,'ok');}
+  save();closeModal();render();
+}
+function delMov(id){
+  confirmAction('¿Eliminar este movimiento?','Esta acción no se puede deshacer.',()=>{
+    state.movimientos=state.movimientos.filter(m=>m.id!==id);save();render();toast('Movimiento eliminado','info');
+  });
+}
+
+/* ----- CITA ----- */
+function openCitaModal(id,fechaDefault){
+  const edit=id?state.citas.find(c=>c.id===id):null;
+  const pacOpts=state.pacientes.filter(p=>!p.archivado||p.id===edit?.pacienteId).sort((a,b)=>a.nombre.localeCompare(b.nombre))
+    .map(p=>`<option value="${p.id}" ${edit&&edit.pacienteId===p.id?'selected':''}>${esc(p.nombre)}</option>`).join('');
+  const body=`
+    <div class="form-grid">
+      <div class="field full"><label>Paciente</label>
+        <select id="cPac" onchange="document.getElementById('cNombre').value=this.options[this.selectedIndex].text!=='— Sin ficha —'?this.options[this.selectedIndex].text:''">
+          <option value="">— Sin ficha —</option>${pacOpts}
+        </select>
+      </div>
+      <div class="field full"><label>Nombre (si no tiene ficha)</label><input type="text" id="cNombre" placeholder="Nombre del paciente" value="${edit?esc(edit.pacienteNombre||''):''}"></div>
+      <div class="field"><label>Fecha</label><input type="date" id="cFecha" value="${edit?edit.fecha:(fechaDefault||todayISO())}"></div>
+      <div class="field"><label>Hora</label><input type="time" id="cHora" value="${edit?(edit.hora||''):'09:00'}"></div>
+      <div class="field"><label>Duración (min)</label><input type="number" id="cDur" min="0" step="15" value="${edit?(edit.duracion||45):45}"></div>
+      <div class="field"><label>Estado</label><select id="cEstado">${Object.entries(ESTADOS).map(([k,v])=>`<option value="${k}" ${edit&&edit.estado===k?'selected':''}>${v.lbl}</option>`).join('')}</select></div>
+      <div class="field full"><label>Motivo / tratamiento</label><input type="text" id="cMotivo" placeholder="Ej: Control, terapia, evaluación…" value="${edit?esc(edit.motivo||''):''}"></div>
+      <div class="field full"><label>Notas</label><textarea id="cNotas" placeholder="Observaciones de la sesión">${edit?esc(edit.notas||''):''}</textarea></div>
+    </div>`;
+  openModal({
+    title:edit?'Editar cita':'Nueva cita',
+    body,
+    footer:`<button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveCita('${id||''}')">${svg(I.check)}${edit?'Guardar':'Agendar'}</button>`
+  });
+}
+function saveCita(id){
+  const pacId=document.getElementById('cPac').value||null;
+  const nombre=document.getElementById('cNombre').value.trim();
+  const fecha=document.getElementById('cFecha').value;
+  if(!fecha){toast('Selecciona una fecha','err');return;}
+  if(!pacId&&!nombre){toast('Indica un paciente o escribe un nombre','err');return;}
+  const data={
+    pacienteId:pacId,
+    pacienteNombre:pacId?(pacienteNombre(pacId)):(nombre||'Cita'),
+    fecha,hora:document.getElementById('cHora').value,
+    duracion:parseInt(document.getElementById('cDur').value)||0,
+    estado:document.getElementById('cEstado').value,
+    motivo:document.getElementById('cMotivo').value.trim(),
+    notas:document.getElementById('cNotas').value.trim()
+  };
+  if(id){const c=state.citas.find(c=>c.id===id);Object.assign(c,data);toast('Cita actualizada','ok');}
+  else{state.citas.push({id:uid(),...data});toast('Cita agendada','ok');}
+  save();closeModal();render();
+}
+function delCita(id,iso){
+  confirmAction('¿Eliminar esta cita?','',()=>{
+    state.citas=state.citas.filter(c=>c.id!==id);save();render();
+    if(iso&&document.getElementById('overlay').classList.contains('open'))openDay(iso);
+    toast('Cita eliminada','info');
+  });
+}
+
+/* ----- PACIENTE ----- */
+function openPacienteModal(id){
+  const edit=id?state.pacientes.find(p=>p.id===id):null;
+  const body=`
+    <div class="form-grid">
+      <div class="field full"><label>Nombre completo</label><input type="text" id="pNombre" placeholder="Ej: María Gómez" value="${edit?esc(edit.nombre):''}"></div>
+      <div class="field"><label>Teléfono</label><input type="tel" id="pTel" placeholder="Ej: 700 12345" value="${edit?esc(edit.telefono||''):''}"></div>
+      <div class="field"><label>Email (opcional)</label><input type="email" id="pEmail" placeholder="correo@ejemplo.com" value="${edit?esc(edit.email||''):''}"></div>
+      <div class="field full"><label>Dolencia / motivo principal</label><input type="text" id="pDol" placeholder="Ej: Lumbalgia, esguince…" value="${edit?esc(edit.dolencia||''):''}"></div>
+      <div class="field full"><label>Notas clínicas</label><textarea id="pNotas" placeholder="Antecedentes, tratamiento, observaciones…">${edit?esc(edit.notas||''):''}</textarea></div>
+    </div>`;
+  openModal({
+    title:edit?'Editar paciente':'Nuevo paciente',
+    body,
+    footer:`<button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="savePaciente('${id||''}')">${svg(I.check)}${edit?'Guardar':'Crear ficha'}</button>`
+  });
+}
+function savePaciente(id){
+  const nombre=document.getElementById('pNombre').value.trim();
+  if(nombre.length<2){toast('Escribe el nombre del paciente','err');return;}
+  const data={
+    nombre,
+    telefono:document.getElementById('pTel').value.trim(),
+    email:document.getElementById('pEmail').value.trim(),
+    dolencia:document.getElementById('pDol').value.trim(),
+    notas:document.getElementById('pNotas').value.trim()
+  };
+  if(id){const p=state.pacientes.find(p=>p.id===id);Object.assign(p,data);toast('Ficha actualizada','ok');}
+  else{state.pacientes.push({id:uid(),creado:Date.now(),...data});toast('Paciente creado','ok');}
+  save();closeModal();render();
+}
+function delPaciente(id){
+  const nCitas=state.citas.filter(c=>c.pacienteId===id).length;
+  confirmAction('¿Eliminar este paciente?',
+    `Se desvincularán ${nCitas} cita(s) y sus pagos quedarán sin paciente asignado.`,()=>{
+    state.pacientes=state.pacientes.filter(p=>p.id!==id);
+    state.citas.forEach(c=>{if(c.pacienteId===id){c.pacienteId=null;}});
+    state.movimientos.forEach(m=>{if(m.pacienteId===id)m.pacienteId=null;});
+    save();render();toast('Paciente eliminado','info');
+  });
+}
+
+/* ----- AJUSTES ----- */
+function openSettings(){
+  const body=`
+    <div class="form-grid">
+      <div class="field full"><label>Nombre del gabinete</label><input type="text" id="sNombre" value="${esc(state.config.nombre)}"></div>
+      <div class="field"><label>Símbolo de moneda</label><input type="text" id="sMoneda" value="${esc(state.config.moneda)}" maxlength="5"></div>
+    </div>
+    <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line-2)">
+      <h4 style="font-size:14px;margin-bottom:6px">Datos</h4>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Todo se guarda solo en este dispositivo/navegador. Exporta una copia con frecuencia para no perder información.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-soft btn-sm" onclick="exportData()">${svg(I.download)}Exportar copia</button>
+        <button class="btn btn-soft btn-sm" onclick="importData()">${svg(I.upload)}Importar copia</button>
+        <button class="btn btn-soft btn-sm" onclick="exportCSV()">${svg(I.doc)}Movimientos CSV</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--neg);border-color:var(--neg)" onclick="resetAll()">${svg(I.trash)}Borrar todo</button>
+      </div>
+    </div>
+    <div style="margin-top:14px;font-size:12px;color:var(--muted)">
+      ${state.movimientos.length} movimientos · ${state.pacientes.length} pacientes · ${state.citas.length} citas
+    </div>`;
+  openModal({
+    title:'Ajustes',
+    body,
+    footer:`<button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
+            <button class="btn btn-primary" onclick="saveSettings()">${svg(I.check)}Guardar</button>`
+  });
+}
+function saveSettings(){
+  state.config.nombre=document.getElementById('sNombre').value.trim()||'Mi Gabinete';
+  state.config.moneda=document.getElementById('sMoneda').value.trim()||'Bs';
+  save();applyConfig();closeModal();render();toast('Ajustes guardados','ok');
+}
+function applyConfig(){
+  document.getElementById('brandName').innerHTML=`${esc(state.config.nombre)}<small>Gestión clínica</small>`;
+  document.title=`${state.config.nombre} · Gestión clínica`;
+}
+
+/* ===========================================================
+   CONFIRM + TOAST
+   =========================================================== */
+function confirmAction(title,msg,onYes){
+  openModal({
+    title,
+    body:`<p style="color:var(--ink-2);font-size:14.5px">${msg||'¿Deseas continuar?'}</p>`,
+    footer:`<button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+            <button class="btn btn-neg" id="confirmYes">Sí, eliminar</button>`
+  });
+  document.getElementById('confirmYes').onclick=()=>{closeModal();onYes();};
+}
+function toast(msg,type){
+  const t=document.createElement('div');
+  t.className='toast '+(type||'info');
+  const ic=type==='err'?I.x:type==='ok'?I.check:I.money;
+  t.innerHTML=svg(ic)+`<span>${esc(msg)}</span>`;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300);},2800);
+}
+
+/* ===========================================================
+   IMPORT / EXPORT / RESET
+   =========================================================== */
+function exportData(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`gabinete_backup_${todayISO()}.json`;a.click();URL.revokeObjectURL(a.href);
+  toast('Copia exportada','ok');
+}
+function importData(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json,application/json';
+  inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+    r.onload=ev=>{try{
+      const d=JSON.parse(ev.target.result);
+      if(Array.isArray(d)){ // formato antiguo (solo ingresos)
+        if(!confirm('Se detectó un archivo del CRM anterior (solo ingresos). ¿Importar como ingresos?'))return;
+        state.movimientos=d.map(i=>({id:uid(),tipo:'ingreso',monto:+i.monto||0,glosa:i.glosa||'',categoria:i.categoria||'Otro',metodo:'Efectivo',pacienteId:null,fecha:new Date(i.timestamp||Date.now()).toISOString().slice(0,10),timestamp:i.timestamp||Date.now()}));
+      }else if(d.movimientos||d.pacientes||d.citas){
+        if(!confirm('¿Reemplazar todos los datos actuales con los del archivo?'))return;
+        const def=defaultState();
+        state={...def,...d,config:{...def.config,...(d.config||{})},movimientos:d.movimientos||[],pacientes:d.pacientes||[],citas:d.citas||[]};
+      }else{toast('Archivo no reconocido','err');return;}
+      save();applyConfig();render();toast('Datos importados','ok');
+    }catch(err){toast('Error al leer el archivo','err');}};
+    r.readAsText(f);};
+  inp.click();
+}
+function exportCSV(){
+  if(!state.movimientos.length){toast('No hay movimientos para exportar','err');return;}
+  const rows=[['Fecha','Tipo','Glosa','Categoria','Paciente','Metodo','Monto']];
+  [...state.movimientos].sort((a,b)=>a.fecha.localeCompare(b.fecha)).forEach(m=>{
+    rows.push([m.fecha,m.tipo,m.glosa,m.categoria,pacienteNombre(m.pacienteId)||'',m.metodo||'',(m.tipo==='egreso'?'-':'')+m.monto]);
+  });
+  const csv='\ufeff'+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`movimientos_${todayISO()}.csv`;a.click();URL.revokeObjectURL(a.href);
+  toast('CSV exportado','ok');
+}
+function resetAll(){
+  confirmAction('¿Borrar TODOS los datos?','Se eliminarán movimientos, pacientes y citas de este dispositivo. Esta acción no se puede deshacer.',()=>{
+    state=defaultState();save();applyConfig();render();toast('Todo borrado','info');
+  });
+}
+
+/* ===========================================================
+   THEME
+   =========================================================== */
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme',state.config.tema);
+  const dark=state.config.tema==='dark';
+  document.getElementById('themeIcon').innerHTML=svg(dark?I.sun:I.moon);
+  document.getElementById('themeLbl').textContent=dark?'Modo claro':'Modo oscuro';
+}
+function toggleTheme(){state.config.tema=state.config.tema==='dark'?'light':'dark';save();applyTheme();}
+
+/* ===========================================================
+   INIT
+   =========================================================== */
+function init(){
+  buildNav();
+  applyConfig();
+  applyTheme();
+  go('dashboard');
+  console.log('✓ Gabinete CRM cargado · datos en localStorage["'+DB_KEY+'"]');
+}
+
+/* Versión personal 3. Cuenta local provisional; migración a Supabase pendiente. */
+const AUTH_KEY='gabinete_personal_account_v1';
+let signedIn=false, account=null, showArchived=false, agendaMode='mes';
+let committed=JSON.stringify(state), lastActivity=Date.now();
+state.sesiones=state.sesiones||[];
+state.version=3;
+committed=JSON.stringify(state);
+const $=id=>document.getElementById(id);
+const value=id=>$(id).value.trim();
+const field=(id,label,val='',type='text')=>`<div class="field"><label for="${id}">${label}</label><input id="${id}" type="${type}" value="${esc(val)}"></div>`;
+const area=(id,label,val='')=>`<div class="field full"><label for="${id}">${label}</label><textarea id="${id}" rows="3">${esc(val)}</textarea></div>`;
+function notifyError(e){toast(e.message||'No se pudo completar la operación','err');}
+save=function(){
+  try{
+    if(!signedIn)throw Error('Ingresa a tu cuenta para guardar.');
+    if(localStorage.getItem(DB_KEY)!==diskVersion)throw Error('Los datos cambiaron en otra ventana. Cierra sesión y vuelve a ingresar antes de editar.');
+    state.version=3;state.sesiones=state.sesiones||[];
+    const serialized=JSON.stringify(state);localStorage.setItem(DB_KEY,serialized);
+    diskVersion=serialized;committed=serialized;
+    $('storageMeta').textContent='Guardado local · '+new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});
+    return true;
+  }catch(e){state=JSON.parse(committed);throw Error(e.message.includes('otra ventana')?e.message:'No se guardó el cambio. Revisa el almacenamiento del navegador y exporta una copia.');}
+};
+let diskVersion=null;
+window.addEventListener('error',e=>{if(signedIn){toast(e.error?.message||'No se pudo completar la acción','err');e.preventDefault();}});
+function commitSuccess(msg,after){try{save();closeModal();render();toast(msg,'ok');if(after)after();return true;}catch(e){notifyError(e);return false;}}
+async function passwordHash(password,salt){
+  const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);
+  const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:Uint8Array.from(salt),iterations:310000,hash:'SHA-256'},key,256);
+  return Array.from(new Uint8Array(bits)).map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+function bootAccess(){
+  signedIn=false;$('appShell').hidden=true;
+  try{account=JSON.parse(localStorage.getItem(AUTH_KEY)||'null');if(account&&(!account.email||!Array.isArray(account.salt)||!account.hash))throw Error('Cuenta local dañada.');}
+  catch(e){$('access').innerHTML='<div class="access-wrap"><div class="card access-card"><h1>No se puede leer la cuenta</h1><p>El navegador no permite almacenamiento o la cuenta está dañada. Conserva tus datos y solicita asistencia antes de borrar el almacenamiento.</p></div></div>';return;}
+  const setup=!account;
+  $('access').hidden=false;
+  $('access').innerHTML=`<div class="access-wrap"><form class="card access-card" id="accessForm"><div class="eyebrow">Gabinete · Personal</div><h1>${setup?'Crea tu acceso':'Bienvenido de nuevo'}</h1><p>${setup?'Configura la única cuenta de este navegador.':'Ingresa para abrir tu agenda y tus pacientes.'}</p>${setup?field('aName','Tu nombre'):''}${field('aEmail','Correo electrónico',account?.email||'','email')}${field('aPassword','Contraseña','','password')}${setup?field('aRepeat','Repite la contraseña','','password'):''}<p id="accessError" class="error-text" role="alert"></p><button class="btn btn-primary" id="accessSubmit">${setup?'Crear cuenta y entrar':'Ingresar'}</button><div class="notice">Versión local. El acceso bloquea la pantalla; los datos del navegador y las copias no están cifrados. La protección en la nube se añadirá con Supabase.</div><p style="font-size:14px;margin-bottom:0">${setup?'Usa una contraseña de al menos 10 caracteres y guárdala en un lugar seguro.':'Si olvidaste la contraseña, esta versión local no envía correos de recuperación. No borres los datos del navegador.'}</p></form></div>`;
+  $('aEmail').required=true;$('aPassword').required=true;$('aPassword').autocomplete=setup?'new-password':'current-password';
+  if(setup){$('aName').required=true;$('aRepeat').required=true;$('aRepeat').autocomplete='new-password';}
+  $('accessForm').onsubmit=async e=>{
+    e.preventDefault();$('accessSubmit').disabled=true;$('accessError').textContent='';
+    try{
+      if(!crypto.subtle)throw Error('Este navegador no permite el acceso seguro local. Abre el archivo en una versión actual de Chrome o Edge.');
+      const email=value('aEmail').toLowerCase(), pass=$('aPassword').value;
+      if(setup){
+        if(localStorage.getItem(AUTH_KEY))throw Error('Ya se creó una cuenta en otra ventana. Vuelve a abrir el archivo.');
+        if(value('aName').length<2)throw Error('Escribe tu nombre.');
+        if(pass.length<10)throw Error('La contraseña debe tener al menos 10 caracteres.');
+        if(pass!==$('aRepeat').value)throw Error('Las contraseñas no coinciden.');
+        const salt=Array.from(crypto.getRandomValues(new Uint8Array(16)));
+        account={name:value('aName'),email,salt,hash:await passwordHash(pass,salt)};
+        localStorage.setItem(AUTH_KEY,JSON.stringify(account));
+      }else if(email!==account.email||await passwordHash(pass,account.salt)!==account.hash)throw Error('Correo o contraseña incorrectos.');
+      diskVersion=localStorage.getItem(DB_KEY);
+      if(diskVersion)state=validateBackup(JSON.parse(diskVersion));
+      else state=validateBackup(loadState());
+      committed=JSON.stringify(state);signedIn=true;lastActivity=Date.now();
+      $('access').innerHTML='';$('access').hidden=true;$('appShell').hidden=false;init();
+    }catch(err){$('accessError').textContent=err.message;}finally{if($('accessSubmit'))$('accessSubmit').disabled=false;}
+  };
+}
+function lockApp(){closeModal();document.querySelectorAll('.view').forEach(v=>v.innerHTML='');$('toasts').innerHTML='';bootAccess();}
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{if(signedIn&&Date.now()-lastActivity>15*60*1000){lockApp();return;}lastActivity=Date.now();}));
+setInterval(()=>{if(signedIn&&Date.now()-lastActivity>15*60*1000)lockApp();},30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&signedIn&&Date.now()-lastActivity>15*60*1000)lockApp();});
+window.addEventListener('storage',e=>{if(e.key===AUTH_KEY&&signedIn)lockApp();});
+function accountSettings(){openModal({title:'Mi cuenta',body:`<p>${esc(account.name)} · ${esc(account.email)}</p><div class="notice">La pantalla se bloquea después de 15 minutos sin actividad.</div>${field('oldPass','Contraseña actual','','password')}${field('newPass','Nueva contraseña (mínimo 10 caracteres)','','password')}${field('repeatPass','Repite la nueva contraseña','','password')}`,footer:'<button class="btn btn-soft" onclick="closeModal()">Cerrar</button><button class="btn btn-primary" id="changePass">Cambiar contraseña</button>'});$('changePass').onclick=async()=>{const btn=$('changePass');btn.disabled=true;try{if(await passwordHash($('oldPass').value,account.salt)!==account.hash)throw Error('Contraseña actual incorrecta.');if($('newPass').value.length<10||$('newPass').value!==$('repeatPass').value)throw Error('La nueva contraseña debe coincidir y tener al menos 10 caracteres.');const salt=Array.from(crypto.getRandomValues(new Uint8Array(16)));const updated={...account,salt,hash:await passwordHash($('newPass').value,salt)};localStorage.setItem(AUTH_KEY,JSON.stringify(updated));account=updated;closeModal();toast('Contraseña actualizada','ok');}catch(e){notifyError(e);}finally{btn.disabled=false;}};}
+
+const clinicalFields=[['documento','Documento de identidad'],['nacimiento','Fecha de nacimiento','date'],['direccion','Dirección'],['emergencia','Contacto de emergencia'],['antecedentes','Antecedentes'],['precauciones','Alergias y precauciones'],['evaluacion','Evaluación inicial'],['objetivos','Objetivos'],['plan','Plan de tratamiento']];
+const oldPatientModal=openPacienteModal;
+const oldPatients=renderPacientes;
+renderPacientes=function(){const input=$('view-pacientes').querySelector('input');const active=input&&document.activeElement===input;const pos=active?input.selectionStart:null;oldPatients();if(active){const next=$('view-pacientes').querySelector('input');next.focus();next.setSelectionRange(pos,pos);}};
+openPacienteModal=function(id){oldPatientModal(id);const p=state.pacientes.find(x=>x.id===id)||{};$('overlay').querySelector('.modal').classList.add('wide');$('overlay').querySelector('.form-grid').insertAdjacentHTML('beforeend',clinicalFields.map(([key,label,type],i)=>i<4?field('p_'+key,label,p[key]||'',type||'text'):area('p_'+key,label,p[key]||'')).join(''));};
+savePaciente=function(id){
+  const nombre=value('pNombre');if(nombre.length<2)return toast('Escribe el nombre completo','err');
+  if(value('pEmail')&&!$('pEmail').checkValidity())return toast('Revisa el correo del paciente','err');
+  if(value('p_nacimiento')&&(!validDate(value('p_nacimiento'))||value('p_nacimiento')>todayISO()))return toast('Revisa la fecha de nacimiento','err');
+  const data={nombre,telefono:value('pTel'),email:value('pEmail'),dolencia:value('pDol'),notas:value('pNotas')};
+  clinicalFields.forEach(([key])=>data[key]=value('p_'+key));
+  if(data.documento&&state.pacientes.some(p=>p.id!==id&&p.documento===data.documento))return toast('Ya existe un paciente con ese documento','err');
+  if(id)Object.assign(state.pacientes.find(p=>p.id===id),data);else{ id=uid();state.pacientes.push({id,creado:Date.now(),...data});}
+  commitSuccess('Ficha guardada',()=>openPacienteDetail(id));
+};
+delPaciente=function(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;openModal({title:p.archivado?'Reactivar paciente':'Archivar paciente',body:'<p>La ficha, las citas, las sesiones y los pagos se conservarán completos.</p>',footer:`<button class="btn btn-soft" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" id="archiveYes">${p.archivado?'Reactivar':'Archivar'}</button>`});$('archiveYes').onclick=()=>{p.archivado=!p.archivado;commitSuccess(p.archivado?'Paciente archivado':'Paciente reactivado');};};
+function sessionPaid(id){return Math.round(state.movimientos.filter(m=>m.sesionId===id&&m.tipo==='ingreso').reduce((n,m)=>n+m.monto,0)*100)/100;}
+function sessionBalance(s){return Math.round(((s.costo||0)-sessionPaid(s.id))*100)/100;}
+openPacienteDetail=function(id){
+  const p=state.pacientes.find(x=>x.id===id);if(!p)return;
+  const sessions=state.sesiones.filter(s=>s.pacienteId===id).sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.creado-a.creado);
+  const citas=state.citas.filter(c=>c.pacienteId===id).sort((a,b)=>(b.fecha+b.hora).localeCompare(a.fecha+a.hora));
+  const pagos=state.movimientos.filter(m=>m.pacienteId===id).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const pending=sessions.reduce((n,s)=>n+Math.max(0,sessionBalance(s)),0);
+  openModal({title:'Ficha del paciente',wide:true,body:`<div class="eyebrow">${p.archivado?'Paciente archivado':'Paciente activo'}</div><h2>${esc(p.nombre)}</h2><p>${esc(p.telefono||'Sin teléfono')} ${p.email?' · '+esc(p.email):''}</p><div class="action-line">${p.archivado?'':`<button class="btn btn-primary" onclick="citaForPatient('${id}')">Agendar cita</button><button class="btn btn-soft" onclick="openSession('${id}')">Registrar sesión</button>`}<button class="btn btn-soft" onclick="patientPayment('${id}')">Registrar ingreso</button></div><div class="detail-stats"><div class="ds"><div class="n">${sessions.length}</div><div class="l">Sesiones</div></div><div class="ds"><div class="n">${money(sumBy(pagos,'ingreso'))}</div><div class="l">Total ingresado</div></div><div class="ds"><div class="n">${money(pending)}</div><div class="l">Pendiente de sesiones</div></div></div><div class="clinical-grid">${[['dolencia','Motivo principal'],...clinicalFields,['notas','Notas generales']].map(([key,label])=>`<article><h4>${label}</h4>${esc(p[key]||'Sin registrar')}</article>`).join('')}</div><h3>Evolución por sesión</h3>${sessions.length?sessions.map(s=>`<article class="timeline-item"><b>${fmtDate(s.fecha)} · ${esc(s.tratamiento)}</b><p>${esc(s.evolucion)}</p><p>Próximo paso: ${esc(s.proximo||'Sin registrar')}</p><small>Registrado por ${esc(s.responsable||'Cuenta personal')} · Dolor ${s.dolor===''||s.dolor==null?'sin registrar':esc(s.dolor)+'/10'}</small><div class="action-line"><span>Costo ${money(s.costo)} · Pagado ${money(sessionPaid(s.id))} · Pendiente ${money(Math.max(0,sessionBalance(s)))}</span>${sessionBalance(s)>0?`<button class="btn btn-pos btn-sm" onclick="paySession('${s.id}')">Registrar pago</button>`:''}</div></article>`).join(''):'<p class="notice">Todavía no hay sesiones registradas.</p>'}<h3>Historial completo de citas</h3>${citas.length?citas.map(c=>citaCard(c)).join(''):'<p class="notice">Sin citas.</p>'}<h3>Historial completo de movimientos</h3>${pagos.length?pagos.map(m=>`<div class="mini-row"><div class="txt"><b>${fmtDate(m.fecha)} · ${esc(m.glosa)}</b><div>${esc(m.metodo)}${m.sesionId?' · Pago de sesión':' · Sin sesión asociada'}</div></div><span>${m.tipo==='egreso'?'−':''}${money(m.monto)}</span></div>`).join(''):'<p class="notice">Sin movimientos.</p>'}`,footer:`<button class="btn btn-soft" onclick="delPaciente('${id}')">${p.archivado?'Reactivar':'Archivar'}</button><button class="btn btn-primary" onclick="openPacienteModal('${id}')">Editar ficha</button><button class="btn btn-soft" onclick="closeModal()">Cerrar</button>`});
+};
+function citaForPatient(id){openCitaModal(null,todayISO());$('cPac').value=id;$('cNombre').value=pacienteNombre(id)||'';}
+const oldCitaModal=openCitaModal;
+openCitaModal=function(id,date){oldCitaModal(id,date);$('cHora').required=true;$('cDur').min='5';$('cDur').max='480';$('cDur').step='5';};
+function validDate(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s))return false;const d=new Date(s+'T12:00:00');return !isNaN(d)&&d.getFullYear()===+s.slice(0,4)&&d.getMonth()+1===+s.slice(5,7)&&d.getDate()===+s.slice(8,10);}
+function minutes(time){const [h,m]=time.split(':').map(Number);return h*60+m;}
+function overlaps(c,others=state.citas){return !['cancelado','ausente'].includes(c.estado)&&others.some(o=>o.id!==c.id&&o.fecha===c.fecha&&!['cancelado','ausente'].includes(o.estado)&&o.hora&&minutes(c.hora)<minutes(o.hora)+(o.duracion||45)&&minutes(c.hora)+c.duracion>minutes(o.hora));}
+saveCita=function(id){
+  const data={id:id||uid(),pacienteId:value('cPac')||null,pacienteNombre:value('cNombre'),fecha:value('cFecha'),hora:value('cHora'),duracion:Number(value('cDur')),estado:value('cEstado'),motivo:value('cMotivo'),notas:value('cNotas')};
+  if(!data.pacienteId&&!data.pacienteNombre)return toast('Selecciona un paciente o escribe su nombre','err');
+  if(!validDate(data.fecha)||!/^([01]\d|2[0-3]):[0-5]\d$/.test(data.hora))return toast('Selecciona fecha y hora válidas','err');
+  if(!Number.isInteger(data.duracion)||data.duracion<5||data.duracion>480||minutes(data.hora)+data.duracion>1440)return toast('La duración debe ser de 5 a 480 minutos y terminar en el mismo día','err');
+  if(overlaps(data))return toast('Este horario se cruza con otra cita. Cambia la hora o duración.','err');
+  if(state.sesiones.some(s=>s.citaId===id)&&(data.pacienteId!==state.citas.find(c=>c.id===id).pacienteId||data.estado!=='atendido'))return toast('Esta cita ya tiene una sesión: conserva el paciente y el estado atendido.','err');
+  if(data.pacienteId)data.pacienteNombre=pacienteNombre(data.pacienteId);
+  if(id)Object.assign(state.citas.find(c=>c.id===id),data);else state.citas.push(data);
+  commitSuccess('Cita guardada');
+};
+delCita=function(id){if(state.sesiones.some(s=>s.citaId===id))return toast('La cita tiene una sesión registrada y debe conservarse.','err');confirmAction('¿Eliminar esta cita?','La cita se eliminará. Para conservarla, cambia su estado a cancelado.',()=>{state.citas=state.citas.filter(c=>c.id!==id);commitSuccess('Cita eliminada');});};
+function citaCard(c){const p=state.pacientes.find(p=>p.id===c.pacienteId);return `<article class="day-entry"><header><b>${esc(c.hora||'Sin hora')}</b><h3>${esc(p?.nombre||c.pacienteNombre||'Cita')}</h3><span class="badge ${ESTADOS[c.estado].cls}">${ESTADOS[c.estado].lbl}</span></header><p>${fmtDate(c.fecha)} · ${c.duracion||0} min · ${esc(c.motivo||'Sin motivo')}</p><div class="action-line">${p?`<button class="btn btn-soft btn-sm" onclick="openPacienteDetail('${p.id}')">Ver ficha</button>`:''}<button class="btn btn-soft btn-sm" onclick="openCitaModal('${c.id}')">Editar cita</button>${p&&!p.archivado&&!['cancelado','ausente'].includes(c.estado)&&!state.sesiones.some(s=>s.citaId===c.id)?`<button class="btn btn-primary btn-sm" onclick="openSession('${p.id}','${c.id}')">Registrar sesión</button>`:''}<button class="btn btn-soft btn-sm" onclick="delCita('${c.id}')">Eliminar cita</button></div></article>`;}
+openDay=function(date){const citas=state.citas.filter(c=>c.fecha===date).sort((a,b)=>a.hora.localeCompare(b.hora));openModal({title:'Citas · '+fmtDate(date),wide:true,body:citas.length?citas.map(citaCard).join(''):'<p class="notice">Sin citas para este día.</p>',footer:`<button class="btn btn-soft" onclick="closeModal()">Cerrar</button><button class="btn btn-primary" onclick="openCitaModal(null,'${date}')">Agregar cita</button>`});};
+const oldAgenda=renderAgenda;
+renderAgenda=function(){
+  const controls=`<div class="toolbar"><div class="seg">${['dia','semana','mes'].map(m=>`<button class="btn ${agendaMode===m?'btn-primary':'btn-soft'}" onclick="agendaMode='${m}';renderAgenda()">${{dia:'Día',semana:'Semana',mes:'Mes'}[m]}</button>`).join('')}</div>${field('agendaDate','Ir a fecha',isoOf(calDate.getFullYear(),calDate.getMonth(),calDate.getDate(),0),'date')}</div>`;
+  if(agendaMode==='mes'){oldAgenda();$('view-agenda').insertAdjacentHTML('afterbegin',controls);}
+  else{
+    const start=new Date(calDate);if(agendaMode==='semana')start.setDate(start.getDate()-(start.getDay()+6)%7);
+    const days=Array.from({length:agendaMode==='semana'?7:1},(_,i)=>isoOf(start.getFullYear(),start.getMonth(),start.getDate()+i,0));
+    $('view-agenda').innerHTML=controls+`<div class="action-line"><button class="btn btn-soft" onclick="moveAgenda(-1)">Anterior</button><button class="btn btn-soft" onclick="calDate=new Date();renderAgenda()">Hoy</button><button class="btn btn-soft" onclick="moveAgenda(1)">Siguiente</button></div><div class="${agendaMode==='semana'?'week-grid':''}">${days.map(day=>{const cs=state.citas.filter(c=>c.fecha===day).sort((a,b)=>a.hora.localeCompare(b.hora));return `<section class="week-day"><h3>${fmtDateLong(day)}</h3><button class="btn btn-soft btn-sm" onclick="openCitaModal(null,'${day}')">Agregar cita</button>${cs.length?cs.map(citaCard).join(''):'<p class="notice">Sin citas</p>'}</section>`;}).join('')}</div>`;
+  }
+  $('agendaDate').onchange=()=>{if(validDate(value('agendaDate'))){calDate=new Date(value('agendaDate')+'T12:00:00');renderAgenda();}};
+};
+function moveAgenda(n){calDate.setDate(calDate.getDate()+n*(agendaMode==='semana'?7:1));renderAgenda();}
+function openSession(patientId,citaId=''){
+  const c=state.citas.find(x=>x.id===citaId);
+  openModal({title:'Registrar sesión · '+esc(pacienteNombre(patientId)),wide:true,body:`<div class="notice">La evolución se conserva como una entrada fechada. Registra otra entrada si necesitas añadir una aclaración.</div><div class="form-grid">${field('sFecha','Fecha',c?.fecha||todayISO(),'date')}${field('sCosto','Costo de esta sesión',0,'number')}${field('sTratamiento','Tratamiento realizado',c?.motivo||'')}${field('sDolor','Dolor referido (0 a 10, opcional)','','number')}${area('sEvolucion','Evolución y observaciones',c?.notas||'')}${area('sProximo','Indicaciones / próximo paso')}</div>`,footer:`<button class="btn btn-soft" onclick="openPacienteDetail('${patientId}')">Cancelar</button><button class="btn btn-primary" id="saveSession">Guardar sesión</button>`});$('sCosto').min='0';$('sCosto').step='0.01';$('sDolor').min='0';$('sDolor').max='10';
+  $('saveSession').onclick=()=>{
+    const fecha=value('sFecha'),costo=Number(value('sCosto')),dolor=value('sDolor');
+    if(!validDate(fecha)||fecha>todayISO())return toast('La sesión debe tener una fecha válida, no futura','err');
+    if(value('sTratamiento').length<2||value('sEvolucion').length<2)return toast('Completa el tratamiento y la evolución','err');
+    if(!value('sCosto')||!Number.isFinite(costo)||costo<0||Math.abs(costo*100-Math.round(costo*100))>1e-6)return toast('Revisa el costo: hasta dos decimales','err');
+    if(dolor!==''&&(!Number.isInteger(+dolor)||+dolor<0||+dolor>10))return toast('El dolor debe ser un entero entre 0 y 10','err');
+    if(citaId&&state.sesiones.some(s=>s.citaId===citaId))return toast('Esta cita ya tiene una sesión','err');
+    if(c&&fecha!==c.fecha)return toast('La fecha debe coincidir con la cita. Reprograma la cita primero.','err');
+    state.sesiones.push({id:uid(),pacienteId:patientId,citaId:citaId||null,fecha,costo,dolor,tratamiento:value('sTratamiento'),evolucion:value('sEvolucion'),proximo:value('sProximo'),responsable:account.name,creado:Date.now()});
+    if(c){const current=state.citas.find(x=>x.id===citaId);current.estado='atendido';}commitSuccess('Sesión registrada',()=>openPacienteDetail(patientId));
+  };
+}
+
+const oldMovModal=openMovModal;
+openMovModal=function(type,id){oldMovModal(type,id);const m=state.movimientos.find(x=>x.id===id);$('overlay').querySelector('.form-grid').insertAdjacentHTML('beforeend','<div class="field full" id="sessionWrap"><label for="mSesion">Sesión (opcional)</label><select id="mSesion"></select></div>');updateSessionOptions(m?.sesionId||'');$('mPac').onchange=()=>updateSessionOptions('');};
+const oldSetType=setMovType;
+setMovType=function(t){oldSetType(t);if($('sessionWrap')){$('sessionWrap').hidden=t!=='ingreso';if(t!=='ingreso')$('mSesion').value='';}};
+function updateSessionOptions(selected){if(!$('mSesion'))return;const pid=value('mPac');$('mSesion').innerHTML='<option value="">Sin sesión asociada</option>'+state.sesiones.filter(s=>s.pacienteId===pid).map(s=>`<option value="${s.id}" ${s.id===selected?'selected':''}>${fmtDate(s.fecha)} · ${esc(s.tratamiento)} · pendiente ${money(Math.max(0,sessionBalance(s)))}</option>`).join('');$('sessionWrap').hidden=_movType!=='ingreso';}
+function patientPayment(id){openMovModal('ingreso');$('mPac').value=id;updateSessionOptions('');}
+function paySession(id){const s=state.sesiones.find(s=>s.id===id);patientPayment(s.pacienteId);updateSessionOptions(id);$('mMonto').value=Math.max(0,sessionBalance(s)).toFixed(2);$('mGlosa').value='Sesión · '+s.tratamiento;}
+saveMov=function(id){
+  const monto=Number(value('mMonto')),glosa=value('mGlosa'),fecha=value('mFecha'),sesionId=_movType==='ingreso'?(value('mSesion')||null):null,pacienteId=_movType==='ingreso'?(value('mPac')||null):null;
+  if(!Number.isFinite(monto)||monto<=0||Math.abs(monto*100-Math.round(monto*100))>1e-6)return toast('Ingresa un monto positivo con hasta dos decimales','err');
+  if(glosa.length<2||!validDate(fecha))return toast('Completa el concepto y una fecha válida','err');
+  if(sesionId){const s=state.sesiones.find(s=>s.id===sesionId);const existing=state.movimientos.find(m=>m.id===id);const previous=existing?.sesionId===sesionId&&existing.tipo==='ingreso'?existing.monto:0;if(!s||s.pacienteId!==pacienteId)return toast('La sesión no corresponde al paciente','err');if(monto>sessionBalance(s)+previous+0.001)return toast('El pago supera el saldo pendiente de la sesión','err');}
+  const data={tipo:_movType,monto,glosa,fecha,categoria:value('mCat'),metodo:value('mMetodo'),pacienteId,sesionId};
+  if(id)Object.assign(state.movimientos.find(m=>m.id===id),data);else state.movimientos.push({id:uid(),timestamp:Date.now(),...data});
+  commitSuccess('Movimiento guardado');
+};
+const oldDashboard=renderDashboard;
+renderDashboard=function(){oldDashboard();const pending=state.sesiones.reduce((n,s)=>n+Math.max(0,sessionBalance(s)),0);$('view-dashboard').insertAdjacentHTML('afterbegin',`<div class="notice">${esc(account?.name||'')} · ${state.pacientes.filter(p=>!p.archivado).length} pacientes activos · ${money(pending)} pendientes de sesiones <button class="btn btn-soft btn-sm" onclick="go('pacientes')">Ver pacientes</button></div>`);};
+
+function validateBackup(d){
+  if(!d||typeof d!=='object'||Array.isArray(d))throw Error('La copia debe ser un objeto JSON del gabinete.');
+  if(d.version&&![2,3].includes(d.version))throw Error('Versión de copia no compatible.');
+  const result={...defaultState(),...d,version:3,config:{...defaultState().config,...d.config},sesiones:d.sesiones||[]};
+  for(const key of ['pacientes','citas','movimientos','sesiones']){
+    if(!Array.isArray(result[key]))throw Error('Formato inválido: '+key);
+    const ids=new Set();for(const row of result[key]){
+      if(!row||typeof row!=='object'||typeof row.id!=='string'||!/^[a-zA-Z0-9_-]{1,100}$/.test(row.id)||ids.has(row.id))throw Error('Identificador inválido o duplicado en '+key);
+      ids.add(row.id);
+      for(const [k,v] of Object.entries(row))if(v!==null&&!['string','number','boolean'].includes(typeof v))throw Error('Campo inválido: '+k);
+    }
+  }
+  for(const key of ['nombre','moneda','tema'])if(typeof result.config[key]!=='string')throw Error('Configuración inválida.');
+  if(!['light','dark'].includes(result.config.tema))throw Error('Tema inválido.');
+  const patientIds=new Set(result.pacientes.map(p=>p.id)),citaIds=new Set(result.citas.map(c=>c.id)),sessionIds=new Set(result.sesiones.map(s=>s.id));
+  for(const p of result.pacientes){if(typeof p.nombre!=='string'||p.nombre.trim().length<2)throw Error('Nombre de paciente inválido.');for(const k of ['telefono','email','dolencia','notas',...clinicalFields.map(f=>f[0])])if(p[k]!=null&&typeof p[k]!=='string')throw Error('Campo de paciente inválido: '+k);}
+  for(const row of [...result.citas,...result.movimientos,...result.sesiones]){
+    if(!validDate(row.fecha))throw Error('Fecha inválida en la copia.');
+    if(row.pacienteId&&!patientIds.has(row.pacienteId))throw Error('Hay referencias a pacientes inexistentes.');
+  }
+  for(const c of result.citas){if(!Object.hasOwn(ESTADOS,c.estado)||typeof c.hora!=='string'||(c.hora&&!/^([01]\d|2[0-3]):[0-5]\d$/.test(c.hora))||!Number.isFinite(c.duracion)||c.duracion<0)throw Error('Cita inválida en la copia.');for(const k of ['pacienteNombre','motivo','notas'])if(c[k]!=null&&typeof c[k]!=='string')throw Error('Texto de cita inválido.');}
+  const usedCitas=new Set();
+  for(const s of result.sesiones){
+    if(!patientIds.has(s.pacienteId)||!Number.isFinite(s.costo)||s.costo<0||typeof s.tratamiento!=='string'||typeof s.evolucion!=='string')throw Error('Sesión inválida.');
+    if(s.citaId){const c=result.citas.find(c=>c.id===s.citaId);if(!citaIds.has(s.citaId)||usedCitas.has(s.citaId)||c.pacienteId!==s.pacienteId||c.estado!=='atendido'||c.fecha!==s.fecha)throw Error('Vínculo de sesión y cita inválido.');usedCitas.add(s.citaId);}
+  }
+  for(const m of result.movimientos){if(!['ingreso','egreso'].includes(m.tipo)||!Number.isFinite(m.monto)||m.monto<=0||typeof m.glosa!=='string'||typeof m.categoria!=='string')throw Error('Movimiento inválido.');if(m.sesionId&&(!sessionIds.has(m.sesionId)||m.tipo!=='ingreso'||result.sesiones.find(s=>s.id===m.sesionId).pacienteId!==m.pacienteId))throw Error('Pago sin sesión válida.');}
+  for(const s of result.sesiones)if(result.movimientos.filter(m=>m.sesionId===s.id).reduce((n,m)=>n+m.monto,0)>s.costo+0.001)throw Error('Hay una sesión con pagos superiores a su costo.');
+  return result;
+}
+importData=function(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json,application/json';
+  inp.onchange=async()=>{const f=inp.files[0];if(!f)return;try{
+    if(f.size>15*1024*1024)throw Error('La copia supera el tamaño permitido (15 MB).');
+    const candidate=validateBackup(JSON.parse(await f.text()));
+    openModal({title:'Revisar restauración',body:`<p>La copia contiene ${candidate.pacientes.length} pacientes, ${candidate.citas.length} citas, ${candidate.sesiones.length} sesiones y ${candidate.movimientos.length} movimientos.</p><div class="notice">Reemplazará los registros actuales. Tu cuenta se conserva. Antes de continuar se guardará una copia local del estado actual.</div>`,footer:'<button class="btn btn-soft" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" id="restoreConfirm">Reemplazar datos</button>'});
+    $('restoreConfirm').onclick=()=>{try{localStorage.setItem(DB_KEY+'_pre_restore',committed);state=candidate;if(commitSuccess('Copia restaurada')){applyConfig();applyTheme();}}catch(e){notifyError(e);}};
+  }catch(e){notifyError(e);}};inp.click();
+};
+const oldSettings=openSettings;
+openSettings=function(){oldSettings();$('overlay').querySelector('.modal-b').insertAdjacentHTML('beforeend',`<div class="notice">Cuenta: ${esc(account.email)}. La exportación incluye sesiones y notas clínicas, pero no la contraseña.</div><button class="btn btn-soft" onclick="restorePrevious()">Recuperar copia anterior a la última restauración</button>`);};
+function restorePrevious(){try{const raw=localStorage.getItem(DB_KEY+'_pre_restore');if(!raw)throw Error('Todavía no existe una copia previa a una restauración.');const candidate=validateBackup(JSON.parse(raw));openModal({title:'Recuperar datos anteriores',body:'<p>Se reemplazarán los registros actuales con la copia previa a la última restauración. Exporta los datos actuales antes de continuar si deseas conservarlos.</p>',footer:'<button class="btn btn-soft" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" id="recoverYes">Recuperar</button>'});$('recoverYes').onclick=()=>{state=candidate;if(commitSuccess('Datos anteriores recuperados')){applyConfig();applyTheme();}};}catch(e){notifyError(e);}}
+exportCSV=function(){if(!state.movimientos.length)return toast('No hay movimientos para exportar','err');const safe=v=>{let s=String(v??'');if(/^[\s]*[=+@-]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';};const rows=[['Fecha','Tipo','Glosa','Categoría','Paciente','Método','Monto','Sesión'],...state.movimientos.map(m=>[m.fecha,m.tipo,m.glosa,m.categoria,pacienteNombre(m.pacienteId)||'',m.metodo,m.monto,m.sesionId||''])];const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+rows.map(r=>r.map(safe).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download='movimientos_'+todayISO()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('CSV exportado','ok');};
+
+/* Modal accesible: etiquetas de formularios anteriores y ciclo de foco. */
+const oldModal=openModal;
+openModal=function(options){oldModal(options);const ov=$('overlay');ov.querySelectorAll('.field').forEach(f=>{const label=f.querySelector('label'),input=f.querySelector('input,textarea,select');if(label&&input?.id)label.htmlFor=input.id;});const title=ov.querySelector('h2');title.id='dialogTitle';ov.querySelector('[role="dialog"]').setAttribute('aria-labelledby','dialogTitle');};
+document.addEventListener('keydown',e=>{if(e.key!=='Tab'||!$('overlay').classList.contains('open'))return;const nodes=Array.from($('overlay').querySelectorAll('button,input,select,textarea,a[href]')).filter(n=>!n.disabled&&n.getClientRects().length);if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){last.focus();e.preventDefault();}else if(!e.shiftKey&&document.activeElement===last){first.focus();e.preventDefault();}});
+
+bootAccess();
+</script>
+</body>
+</html>
